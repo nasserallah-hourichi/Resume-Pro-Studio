@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -11,14 +10,148 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;600;700&family=Merriweather:wght@400;700&family=Montserrat:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap"
-        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;600;700&family=Merriweather:wght@400;700&family=Montserrat:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-    <div class="app">
+<div class="app-shell">
+    <section id="landingView" class="landing-view">
+        <header class="landing-header">
+            <div class="brand-lockup">
+                <div class="logo-icon">
+                    <i class="fas fa-file-signature"></i>
+                </div>
+                <div class="logo-text">
+                    <span class="logo-title">Pro Resume Studio</span>
+                    <span class="logo-tagline">Create - Customize - Shine</span>
+                </div>
+            </div>
+            <div class="landing-actions">
+                <button class="btn-icon btn-outline" data-open-auth="login">Log In</button>
+                <button class="btn-icon" data-open-auth="signup">Start Free</button>
+            </div>
+        </header>
+
+        <main class="landing-main">
+            <section class="hero-card">
+                <div class="hero-copy">
+                    <span class="hero-eyebrow">Resume Builder For Modern Professionals</span>
+                    <h1>Build a polished resume, switch templates instantly, and export in minutes.</h1>
+                    <p>Design, edit, organize, and export professional resumes with bilingual support, rich templates, custom sections, and cloud-ready authentication.</p>
+                    <div class="hero-cta">
+                        <button class="btn-icon hero-primary" data-open-auth="signup">Create Your Account</button>
+                        <button class="btn-icon btn-outline" data-open-auth="login">I Already Have An Account</button>
+                    </div>
+                    <div class="hero-social-proof">
+                        <span><i class="fas fa-check-circle"></i> Email, Google, and LinkedIn sign-in</span>
+                        <span><i class="fas fa-check-circle"></i> Instant PDF export</span>
+                        <span><i class="fas fa-check-circle"></i> Template-based editing studio</span>
+                    </div>
+                </div>
+                <div class="hero-preview">
+                    <div class="preview-window">
+                        <div class="preview-toolbar">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <div class="preview-resume">
+                            <div class="preview-name"></div>
+                            <div class="preview-headline"></div>
+                            <div class="preview-line long"></div>
+                            <div class="preview-line medium"></div>
+                            <div class="preview-grid">
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                            </div>
+                            <div class="preview-section">
+                                <div class="preview-section-title"></div>
+                                <div class="preview-line long"></div>
+                                <div class="preview-line short"></div>
+                            </div>
+                            <div class="preview-section">
+                                <div class="preview-section-title"></div>
+                                <div class="preview-line medium"></div>
+                                <div class="preview-line long"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="feature-grid">
+                <article class="feature-card">
+                    <i class="fas fa-layer-group"></i>
+                    <h2>Template Studio</h2>
+                    <p>Switch between professional templates without losing your resume data.</p>
+                </article>
+                <article class="feature-card">
+                    <i class="fas fa-user-shield"></i>
+                    <h2>Secure Sessions</h2>
+                    <p>Supabase-powered login, signup, and persistent sessions across refreshes.</p>
+                </article>
+                <article class="feature-card">
+                    <i class="fas fa-wand-magic-sparkles"></i>
+                    <h2>Custom Sections</h2>
+                    <p>Create projects, certifications, achievements, and more with your own structure.</p>
+                </article>
+            </section>
+        </main>
+    </section>
+
+    <div id="authModal" class="auth-modal hidden" aria-hidden="true">
+        <div class="auth-backdrop" data-close-auth="true"></div>
+        <div class="auth-dialog">
+            <button id="closeAuthModalBtn" class="auth-close-btn" type="button" aria-label="Close authentication dialog">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="auth-panel">
+                <span class="panel-eyebrow">Secure Access</span>
+                <h2 id="authTitle">Welcome back</h2>
+                <p id="authSubtitle">Sign in to continue building and managing your resume.</p>
+
+                <div class="oauth-button-group">
+                    <button id="googleAuthBtn" class="oauth-btn google-btn" type="button">
+                        <i class="fab fa-google"></i>
+                        Continue with Google
+                    </button>
+                    <!-- <button id="linkedinAuthBtn" class="oauth-btn linkedin-btn" type="button">
+                        <i class="fab fa-linkedin"></i>
+                        Continue with LinkedIn
+                    </button> -->
+                </div>
+
+                <div class="auth-divider"><span>or use email</span></div>
+
+                <form id="authForm" class="auth-form">
+                    <label>
+                        <span>Email</span>
+                        <input id="authEmail" type="email" autocomplete="email" placeholder="you@example.com" required>
+                    </label>
+                    <label>
+                        <span>Password</span>
+                        <input id="authPassword" type="password" autocomplete="current-password" placeholder="Enter your password" required>
+                    </label>
+                    <label id="authNameField" class="hidden">
+                        <span>Full Name</span>
+                        <input id="authFullName" type="text" autocomplete="name" placeholder="Your full name">
+                    </label>
+                    <button id="authSubmitBtn" class="btn-icon auth-submit" type="submit">Log In</button>
+                </form>
+
+                <p id="authStatus" class="auth-status" role="status"></p>
+
+                <div class="auth-switch">
+                    <span id="authSwitchLabel">Need an account?</span>
+                    <button id="authSwitchBtn" type="button">Create one</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="appView" class="app hidden">
         <div class="main-header">
             <div class="logo-area">
                 <div class="logo-icon">
@@ -36,12 +169,20 @@
                 </div>
                 <div class="action-buttons">
                     <button id="savePdfBtn" class="btn-icon"><i class="fas fa-file-pdf"></i> PDF Resume</button>
-                    <button id="importResumeBtn" class="btn-icon btn-outline"><i class="fas fa-upload"></i> Import
-                        JSON</button>
-                    <button id="exportDataBtn" class="btn-icon btn-outline"><i class="fas fa-download"></i>
-                        Export</button>
+                    <button id="importResumeBtn" class="btn-icon btn-outline"><i class="fas fa-upload"></i> Import JSON</button>
+                    <button id="exportDataBtn" class="btn-icon btn-outline"><i class="fas fa-download"></i> Export</button>
                     <button id="resetDemoBtn" class="btn-icon btn-outline"><i class="fas fa-undo"></i> Reset</button>
                     <input type="file" id="importFile" accept=".json" hidden>
+                </div>
+                <div class="user-menu">
+                    <div class="user-badge">
+                        <span id="userInitials">PR</span>
+                    </div>
+                    <div class="user-meta">
+                        <strong id="userDisplayName">Guest</strong>
+                        <small id="userDisplayEmail">Connect Supabase to enable cloud sessions</small>
+                    </div>
+                    <button id="signOutBtn" class="btn-icon btn-outline">Sign Out</button>
                 </div>
             </div>
         </div>
@@ -69,8 +210,7 @@
                         <span class="panel-eyebrow">Visibility</span>
                         <h2>Sections</h2>
                     </div>
-                    <button id="addCustomSectionBtn" class="sidebar-action-btn"><i class="fas fa-plus"></i> Add Custom
-                        Section</button>
+                    <button id="addCustomSectionBtn" class="sidebar-action-btn"><i class="fas fa-plus"></i> Add Custom Section</button>
                     <div id="sectionVisibilityControls" class="section-toggle-list"></div>
                 </section>
             </aside>
@@ -80,45 +220,38 @@
                     <div class="controls-row">
                         <div class="style-group">
                             <div class="ctrl"><label>Font</label><select id="globalFontSelect">
-                                    <option value="'Inter', sans-serif">Inter</option>
-                                    <option value="'Roboto', sans-serif">Roboto</option>
-                                    <option value="'Poppins', sans-serif">Poppins</option>
-                                    <option value="'Montserrat', sans-serif">Montserrat</option>
-                                    <option value="'Merriweather', serif">Merriweather</option>
-                                </select></div>
+                                <option value="'Inter', sans-serif">Inter</option>
+                                <option value="'Roboto', sans-serif">Roboto</option>
+                                <option value="'Poppins', sans-serif">Poppins</option>
+                                <option value="'Montserrat', sans-serif">Montserrat</option>
+                                <option value="'Merriweather', serif">Merriweather</option>
+                            </select></div>
                             <div class="ctrl"><label>Base Size</label><select id="baseFontSize">
-                                    <option value="12px">12px</option>
-                                    <option value="13px">13px</option>
-                                    <option value="14px" selected>14px</option>
-                                    <option value="15px">15px</option>
-                                </select></div>
-                            <div class="ctrl"><label>Section Title</label><input type="color" id="sectionTitleColor"
-                                    value="#0f172a" class="color-input"></div>
-                            <div class="ctrl"><label>Text Color</label><input type="color" id="textColor"
-                                    value="#1e293b" class="color-input"></div>
-                            <div class="ctrl"><label>Name Color</label><input type="color" id="nameColor"
-                                    value="#0f172a" class="color-input"></div>
-                            <div class="ctrl"><label>Headline</label><input type="color" id="headlineColor"
-                                    value="#334155" class="color-input"></div>
+                                <option value="12px">12px</option>
+                                <option value="13px">13px</option>
+                                <option value="14px" selected>14px</option>
+                                <option value="15px">15px</option>
+                            </select></div>
+                            <div class="ctrl"><label>Section Title</label><input type="color" id="sectionTitleColor" value="#0f172a" class="color-input"></div>
+                            <div class="ctrl"><label>Text Color</label><input type="color" id="textColor" value="#1e293b" class="color-input"></div>
+                            <div class="ctrl"><label>Name Color</label><input type="color" id="nameColor" value="#0f172a" class="color-input"></div>
+                            <div class="ctrl"><label>Headline</label><input type="color" id="headlineColor" value="#334155" class="color-input"></div>
                         </div>
                     </div>
                     <div class="controls-row secondary">
-                        <div class="ctrl"><label>Exp Title Color</label><input type="color" id="expTitleColor"
-                                value="#0f172a"></div>
-                        <div class="ctrl"><label>Company Color</label><input type="color" id="companyColor"
-                                value="#475569"></div>
-                        <div class="ctrl"><label>Date Color</label><input type="color" id="dateColor" value="#64748b">
-                        </div>
+                        <div class="ctrl"><label>Exp Title Color</label><input type="color" id="expTitleColor" value="#0f172a"></div>
+                        <div class="ctrl"><label>Company Color</label><input type="color" id="companyColor" value="#475569"></div>
+                        <div class="ctrl"><label>Date Color</label><input type="color" id="dateColor" value="#64748b"></div>
                         <div class="ctrl"><label>Section Title Size</label><select id="sectionTitleSize">
-                                <option value="0.85rem">0.85rem</option>
-                                <option value="0.9rem" selected>0.9rem</option>
-                                <option value="1rem">1rem</option>
-                            </select></div>
+                            <option value="0.85rem">0.85rem</option>
+                            <option value="0.9rem" selected>0.9rem</option>
+                            <option value="1rem">1rem</option>
+                        </select></div>
                         <div class="ctrl"><label>Skills Columns</label><select id="skillsColumnsSelect">
-                                <option value="2">2 Columns</option>
-                                <option value="3" selected>3 Columns</option>
-                                <option value="4">4 Columns</option>
-                            </select></div>
+                            <option value="2">2 Columns</option>
+                            <option value="3" selected>3 Columns</option>
+                            <option value="4">4 Columns</option>
+                        </select></div>
                     </div>
                 </div>
 
@@ -130,8 +263,9 @@
             </main>
         </div>
     </div>
+</div>
 
-    <script src="server.js"></script>
+<script src="supabase-config.js"></script>
+<script src="server.js"></script>
 </body>
-
 </html>

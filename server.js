@@ -206,7 +206,7 @@ const themePresets = [
     }
 ];
 
-const sectionMeta = [
+const baseSectionMeta = [
     { id: "summary", label: "Summary" },
     { id: "experience", label: "Experience" },
     { id: "education", label: "Education" },
@@ -220,6 +220,12 @@ let currentTemplateId = loadTemplateSelection();
 let sectionVisibility = loadSectionVisibility();
 let sortableInstance = null;
 let customSectionCounter = loadCustomSectionCounter();
+let currentUser = null;
+let authMode = "login";
+let supabaseClient = null;
+let authReady = false;
+
+const dom = {};
 
 function deepClone(value) {
     return JSON.parse(JSON.stringify(value));
@@ -236,8 +242,8 @@ function getSeedResumeData(lang) {
     };
 }
 
-function cloneResumeData(data) {
-    const seed = getSeedResumeData(currentLang);
+function cloneResumeData(data, lang = currentLang) {
+    const seed = getSeedResumeData(lang);
     const source = data || {};
 
     return {
@@ -306,8 +312,9 @@ function getAllSectionMeta() {
             sectionVisibility[section.id] = true;
         }
     });
+
     return [
-        ...sectionMeta,
+        ...baseSectionMeta,
         ...customSections.map((section) => ({
             id: section.id,
             label: section.title || "Custom Section"
@@ -315,8 +322,64 @@ function getAllSectionMeta() {
     ];
 }
 
+function getSupabaseConfig() {
+    const config = window.SUPABASE_CONFIG || {};
+    const url = typeof config.url === "string" ? config.url.trim() : "";
+    const anonKey = typeof config.anonKey === "string" ? config.anonKey.trim() : "";
+    const redirectTo = typeof config.redirectTo === "string" && config.redirectTo.trim()
+        ? config.redirectTo.trim()
+        : window.location.origin === "null"
+            ? ""
+            : `${window.location.origin}${window.location.pathname}`;
+
+    return {
+        url,
+        anonKey,
+        redirectTo
+    };
+}
+
+async function loadRuntimeSupabaseConfig() {
+    try {
+        const response = await fetch("/api/config", { cache: "no-store" });
+        if (!response.ok) return;
+
+        const runtimeConfig = await response.json();
+        const currentConfig = window.SUPABASE_CONFIG || {};
+        window.SUPABASE_CONFIG = {
+            ...currentConfig,
+            ...(runtimeConfig || {})
+        };
+    } catch (_error) {
+        // Ignore runtime config fetch failures and fall back to local config.
+    }
+}
+
+function hasSupabaseCredentials() {
+    const config = getSupabaseConfig();
+    return Boolean(config.url && config.anonKey);
+}
+
+function isHttpOrigin() {
+    return window.location.protocol === "http:" || window.location.protocol === "https:";
+}
+
+function initSupabase() {
+    if (!window.supabase || typeof window.supabase.createClient !== "function") return null;
+    if (!hasSupabaseCredentials()) return null;
+
+    const config = getSupabaseConfig();
+    return window.supabase.createClient(config.url, config.anonKey, {
+        auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true
+        }
+    });
+}
+
 function extractResumeData() {
-    const fallback = cloneResumeData(currentResumeData || getSeedResumeData(currentLang));
+    const fallback = cloneResumeData(currentResumeData || getSeedResumeData(currentLang), currentLang);
     if (!document.getElementById("resumeContainer")) return fallback;
 
     const getText = (id, defaultValue = "") => {
@@ -419,7 +482,7 @@ function buildSectionMarkup(sectionType, title, contentHtml, actionHtml) {
 
 function buildResumeHTML(lang, customData) {
     const template = getTemplateById(currentTemplateId);
-    const data = cloneResumeData(customData || currentResumeData || getSeedResumeData(lang));
+    const data = cloneResumeData(customData || currentResumeData || getSeedResumeData(lang), lang);
     (data.customSections || []).forEach((section) => {
         if (typeof sectionVisibility[section.id] === "undefined") {
             sectionVisibility[section.id] = true;
@@ -819,7 +882,7 @@ function renderSectionVisibilityControls() {
     container.innerHTML = getAllSectionMeta().map((section) => `
         <label class="section-toggle">
             <input type="checkbox" data-section-toggle="${section.id}" ${sectionVisibility[section.id] ? "checked" : ""}>
-            <span>${section.label}</span>
+            <span>${escapeHtml(section.label)}</span>
         </label>
     `).join("");
 }
@@ -833,7 +896,7 @@ function renderResume(lang, keepData = true) {
     initSortable();
     applySectionOrder();
 
-    currentResumeData = cloneResumeData(finalData);
+    currentResumeData = cloneResumeData(finalData, lang);
     applyGlobalStyles();
 }
 
@@ -920,8 +983,9 @@ async function generateCleanPDF() {
 function importResumeFromJSON(jsonStr) {
     try {
         const imported = JSON.parse(jsonStr);
-        currentResumeData = cloneResumeData({ ...getSeedResumeData(currentLang), ...imported });
+        currentResumeData = cloneResumeData({ ...getSeedResumeData(currentLang), ...imported }, currentLang);
         renderResume(currentLang, false);
+        renderSectionVisibilityControls();
     } catch (error) {
         alert("Invalid JSON file format");
     }
@@ -968,6 +1032,185 @@ function setLanguage(lang) {
     document.querySelectorAll(".lang-btn").forEach((button) => {
         button.classList.toggle("active", button.dataset.lang === lang);
     });
+}
+
+function renderStudioChrome() {
+    renderTemplateList();
+    renderThemePresetList();
+    renderSectionVisibilityControls();
+    applyTemplateDefaults(currentTemplateId);
+    renderResume(currentLang, false);
+}
+
+function setAuthStatus(message = "", tone = "") {
+    if (!dom.authStatus) return;
+    dom.authStatus.textContent = message;
+    dom.authStatus.className = "auth-status";
+    if (tone) dom.authStatus.classList.add(tone);
+}
+
+function setAuthMode(mode) {
+    authMode = mode === "signup" ? "signup" : "login";
+    const isSignup = authMode === "signup";
+
+    dom.authTitle.textContent = isSignup ? "Create your account" : "Welcome back";
+    dom.authSubtitle.textContent = isSignup
+        ? "Sign up to unlock the full resume studio and keep your sessions connected."
+        : "Sign in to continue building and managing your resume.";
+    dom.authSubmitBtn.textContent = isSignup ? "Create Account" : "Log In";
+    dom.authNameField.classList.toggle("hidden", !isSignup);
+    dom.authPassword.setAttribute("autocomplete", isSignup ? "new-password" : "current-password");
+    dom.authSwitchLabel.textContent = isSignup ? "Already have an account?" : "Need an account?";
+    dom.authSwitchBtn.textContent = isSignup ? "Log in instead" : "Create one";
+    setAuthStatus("");
+}
+
+function openAuthModal(mode = "login") {
+    setAuthMode(mode);
+    dom.authModal.classList.remove("hidden");
+    dom.authModal.setAttribute("aria-hidden", "false");
+}
+
+function closeAuthModal() {
+    dom.authModal.classList.add("hidden");
+    dom.authModal.setAttribute("aria-hidden", "true");
+    setAuthStatus("");
+}
+
+function getUserDisplayName(user) {
+    const metadata = user?.user_metadata || {};
+    return metadata.full_name || metadata.name || user?.email?.split("@")[0] || "Resume Builder";
+}
+
+function getUserInitials(name) {
+    const normalized = (name || "RB").trim();
+    const parts = normalized.split(/\s+/).filter(Boolean);
+    if (!parts.length) return "RB";
+    return parts.slice(0, 2).map((part) => part[0]).join("").toUpperCase();
+}
+
+function updateUserUI(user) {
+    const name = user ? getUserDisplayName(user) : "Guest";
+    const email = user?.email || "Connect Supabase to enable cloud sessions";
+    dom.userDisplayName.textContent = name;
+    dom.userDisplayEmail.textContent = email;
+    dom.userInitials.textContent = getUserInitials(name);
+}
+
+function showLandingState() {
+    dom.landingView.classList.remove("hidden");
+    dom.appView.classList.add("hidden");
+}
+
+function showStudioState() {
+    dom.landingView.classList.add("hidden");
+    dom.appView.classList.remove("hidden");
+}
+
+function applySessionState(user) {
+    currentUser = user || null;
+    updateUserUI(currentUser);
+
+    if (currentUser) {
+        showStudioState();
+        closeAuthModal();
+        if (!document.getElementById("resumeContainer").innerHTML.trim()) {
+            renderStudioChrome();
+        }
+    } else {
+        showLandingState();
+    }
+}
+
+async function handleAuthSubmit(event) {
+    event.preventDefault();
+
+    if (!supabaseClient) {
+        setAuthStatus("Add your Supabase project URL and anon key in supabase-config.js first.", "error");
+        return;
+    }
+
+    const email = dom.authEmail.value.trim();
+    const password = dom.authPassword.value;
+    const fullName = dom.authFullName.value.trim();
+
+    if (!email || !password) {
+        setAuthStatus("Email and password are required.", "error");
+        return;
+    }
+
+    setAuthStatus("Working on it...");
+    dom.authSubmitBtn.disabled = true;
+
+    try {
+        if (authMode === "signup") {
+            const { error } = await supabaseClient.auth.signUp({
+                email,
+                password,
+                options: {
+                    emailRedirectTo: getSupabaseConfig().redirectTo || undefined,
+                    data: {
+                        full_name: fullName
+                    }
+                }
+            });
+
+            if (error) throw error;
+            setAuthStatus("Account created. Check your email if confirmation is enabled, then sign in.", "success");
+        } else {
+            const { error } = await supabaseClient.auth.signInWithPassword({
+                email,
+                password
+            });
+
+            if (error) throw error;
+            setAuthStatus("Signed in successfully.", "success");
+        }
+    } catch (error) {
+        setAuthStatus(error.message || "Authentication failed.", "error");
+    } finally {
+        dom.authSubmitBtn.disabled = false;
+    }
+}
+
+async function handleOAuthSignIn(provider) {
+    if (!isHttpOrigin()) {
+        setAuthStatus("Social login requires running the app from http://localhost or http://127.0.0.1, not directly from a file.", "error");
+        openAuthModal(authMode);
+        return;
+    }
+
+    if (!supabaseClient) {
+        setAuthStatus("Add your Supabase project URL and anon key in supabase-config.js first.", "error");
+        openAuthModal(authMode);
+        return;
+    }
+
+    const redirectTo = getSupabaseConfig().redirectTo || undefined;
+    setAuthStatus(`Redirecting to ${provider === "google" ? "Google" : "LinkedIn"}...`);
+
+    const { error } = await supabaseClient.auth.signInWithOAuth({
+        provider,
+        options: {
+            redirectTo
+        }
+    });
+
+    if (error) {
+        setAuthStatus(error.message || "Unable to start social sign-in.", "error");
+    }
+}
+
+async function handleSignOut() {
+    if (!supabaseClient) {
+        applySessionState(null);
+        return;
+    }
+
+    const { error } = await supabaseClient.auth.signOut();
+    if (error) {
+        alert(error.message || "Unable to sign out.");
+    }
 }
 
 function bindSidebarEvents() {
@@ -1024,17 +1267,52 @@ function bindStyleControls() {
     });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    currentResumeData = getSeedResumeData(currentLang);
+function cacheDom() {
+    dom.landingView = document.getElementById("landingView");
+    dom.appView = document.getElementById("appView");
+    dom.authModal = document.getElementById("authModal");
+    dom.authTitle = document.getElementById("authTitle");
+    dom.authSubtitle = document.getElementById("authSubtitle");
+    dom.authForm = document.getElementById("authForm");
+    dom.authEmail = document.getElementById("authEmail");
+    dom.authPassword = document.getElementById("authPassword");
+    dom.authFullName = document.getElementById("authFullName");
+    dom.authNameField = document.getElementById("authNameField");
+    dom.authSubmitBtn = document.getElementById("authSubmitBtn");
+    dom.authStatus = document.getElementById("authStatus");
+    dom.authSwitchLabel = document.getElementById("authSwitchLabel");
+    dom.authSwitchBtn = document.getElementById("authSwitchBtn");
+    dom.closeAuthModalBtn = document.getElementById("closeAuthModalBtn");
+    dom.googleAuthBtn = document.getElementById("googleAuthBtn");
+    dom.linkedinAuthBtn = document.getElementById("linkedinAuthBtn");
+    dom.userDisplayName = document.getElementById("userDisplayName");
+    dom.userDisplayEmail = document.getElementById("userDisplayEmail");
+    dom.userInitials = document.getElementById("userInitials");
+    dom.signOutBtn = document.getElementById("signOutBtn");
+}
 
-    renderTemplateList();
-    renderThemePresetList();
-    renderSectionVisibilityControls();
+function bindAuthUI() {
+    document.querySelectorAll("[data-open-auth]").forEach((button) => {
+        button.addEventListener("click", () => openAuthModal(button.getAttribute("data-open-auth")));
+    });
+
+    document.querySelectorAll("[data-close-auth]").forEach((button) => {
+        button.addEventListener("click", closeAuthModal);
+    });
+
+    dom.closeAuthModalBtn?.addEventListener("click", closeAuthModal);
+    dom.authSwitchBtn?.addEventListener("click", () => {
+        setAuthMode(authMode === "login" ? "signup" : "login");
+    });
+    dom.authForm?.addEventListener("submit", handleAuthSubmit);
+    dom.googleAuthBtn?.addEventListener("click", () => handleOAuthSignIn("google"));
+    dom.linkedinAuthBtn?.addEventListener("click", () => handleOAuthSignIn("linkedin_oidc"));
+    dom.signOutBtn?.addEventListener("click", handleSignOut);
+}
+
+function bindStudioEvents() {
     bindSidebarEvents();
     bindStyleControls();
-
-    applyTemplateDefaults(currentTemplateId);
-    renderResume(currentLang, false);
 
     document.getElementById("savePdfBtn")?.addEventListener("click", generateCleanPDF);
     document.getElementById("importResumeBtn")?.addEventListener("click", () => {
@@ -1055,4 +1333,44 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".lang-btn").forEach((button) => {
         button.addEventListener("click", (event) => setLanguage(event.currentTarget.dataset.lang));
     });
+}
+
+async function hydrateAuthSession() {
+    if (!supabaseClient) {
+        applySessionState(null);
+        authReady = true;
+        return;
+    }
+
+    const { data, error } = await supabaseClient.auth.getSession();
+    if (error) {
+        setAuthStatus(error.message, "error");
+    }
+    applySessionState(data?.session?.user || null);
+    authReady = true;
+
+    supabaseClient.auth.onAuthStateChange((_event, session) => {
+        applySessionState(session?.user || null);
+    });
+}
+
+function maybeShowConfigHint() {
+    if (hasSupabaseCredentials()) return;
+    setAuthStatus("Supabase is not configured yet. Update supabase-config.js with your project URL and anon key.", "error");
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+    cacheDom();
+    setAuthMode("login");
+    bindAuthUI();
+    bindStudioEvents();
+
+    currentResumeData = getSeedResumeData(currentLang);
+    renderStudioChrome();
+    updateUserUI(null);
+
+    await loadRuntimeSupabaseConfig();
+    supabaseClient = initSupabase();
+    maybeShowConfigHint();
+    await hydrateAuthSession();
 });

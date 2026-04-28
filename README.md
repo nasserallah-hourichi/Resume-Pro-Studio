@@ -1,6 +1,6 @@
 # Pro Resume Studio
 
-Pro Resume Studio is a browser-based resume builder for creating polished English and French resumes with live editing, layout customization, JSON import/export, drag-and-drop section ordering, and PDF export.
+Pro Resume Studio is a browser-based resume builder for creating polished English and French resumes with live editing, layout customization, JSON import/export, drag-and-drop section ordering, PDF export, and Supabase-based authentication.
 
 ## Highlights
 
@@ -11,23 +11,24 @@ Pro Resume Studio is a browser-based resume builder for creating polished Englis
 - Multi-column skills layout with 2, 3, or 4 columns
 - JSON import and export for saving and reusing resume data
 - PDF export for clean, print-ready resumes
+- Supabase email/password auth with Google and LinkedIn OAuth entry points
 - Responsive interface for desktop and mobile screens
 
 ## Project Structure
 
-- [index.html](/c:/Users/Anis%20Ghabi/Desktop/resume_generator/index.html) contains the app layout and toolbar
+- [index.html](/c:/Users/Anis%20Ghabi/Desktop/resume_generator/index.html) contains the landing page, auth modal, and studio layout
 - [style.css](/c:/Users/Anis%20Ghabi/Desktop/resume_generator/style.css) contains the visual design and responsive styles
-- [server.js](/c:/Users/Anis%20Ghabi/Desktop/resume_generator/server.js) contains the client-side resume logic, rendering, import/export, and PDF generation
+- [server.js](/c:/Users/Anis%20Ghabi/Desktop/resume_generator/server.js) contains the client-side resume logic, rendering, authentication, import/export, and PDF generation
+- [supabase-config.js](/c:/Users/Anis%20Ghabi/Desktop/resume_generator/supabase-config.js) contains your local Supabase client configuration
+- [supabase-config.example.js](/c:/Users/Anis%20Ghabi/Desktop/resume_generator/supabase-config.example.js) shows the expected config format
 
 ## How To Run
 
 This project does not require a build step.
 
 1. Clone or download the project.
-2. Open `index.html` in your browser.
-3. Start editing the resume content directly on the page.
-
-If your browser blocks some local features, serve the folder with a lightweight local server instead.
+2. Serve the folder from a local HTTP URL.
+3. Open the local app URL in your browser.
 
 Example:
 
@@ -35,17 +36,36 @@ Example:
 npx serve .
 ```
 
-Then open the local URL shown in the terminal.
+## Supabase Setup
+
+1. Create a Supabase project.
+2. Copy your Supabase project URL and anon key.
+3. Use the frontend project URL like `https://your-project-ref.supabase.co`, not the Postgres database connection string.
+4. Update [supabase-config.js](/c:/Users/Anis%20Ghabi/Desktop/resume_generator/supabase-config.js) for local development if needed.
+5. In Vercel, set `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and `APP_URL` environment variables.
+6. Add your app URL to Supabase Authentication `URL Configuration`.
+7. Enable `Google` and `LinkedIn (OIDC)` in Supabase Authentication providers.
+8. Configure Google and LinkedIn credentials inside Supabase before testing social sign-in.
+
+Recommended Vercel environment variables:
+
+```text
+SUPABASE_URL=https://your-project-ref.supabase.co
+SUPABASE_ANON_KEY=your-public-anon-key
+APP_URL=https://your-vercel-domain.vercel.app
+```
 
 ## How To Use
 
-1. Edit the name, title, summary, experience, education, skills, and languages directly in the resume preview.
-2. Use the language buttons to switch between English and French.
-3. Use the design toolbar to change font, text colors, section title color, and sizing.
-4. Change the skills layout from 2 to 4 columns.
-5. Drag sections using the handle on the left to reorder them.
-6. Use `Import JSON` to load a saved resume and `Export` to download the current one.
-7. Use `PDF Resume` to generate a downloadable PDF.
+1. Open the landing page.
+2. Create an account or sign in with email, Google, or LinkedIn.
+3. Edit the name, title, summary, experience, education, skills, and languages directly in the resume preview.
+4. Use the language buttons to switch between English and French.
+5. Use the design toolbar to change font, text colors, section title color, and sizing.
+6. Change the skills layout from 2 to 4 columns.
+7. Drag sections using the handle on the left to reorder them.
+8. Use `Import JSON` to load a saved resume and `Export` to download the current one.
+9. Use `PDF Resume` to generate a downloadable PDF.
 
 ## Resume Data Format
 
@@ -80,6 +100,13 @@ Imported JSON should follow the app's data shape:
       "name": "English",
       "level": "Fluent"
     }
+  ],
+  "customSections": [
+    {
+      "id": "custom-1",
+      "title": "Projects",
+      "content": "Your custom section content"
+    }
   ]
 }
 ```
@@ -90,6 +117,7 @@ The app uses CDN-hosted libraries in the browser:
 
 - `html2pdf.js` for PDF export
 - `SortableJS` for drag-and-drop section ordering
+- `@supabase/supabase-js` for authentication and session management
 - `Font Awesome` for icons
 - `Google Fonts` for typography
 
@@ -98,15 +126,8 @@ The app uses CDN-hosted libraries in the browser:
 - Section order is saved in the browser with `localStorage`.
 - The file named `server.js` is currently frontend JavaScript, not a backend server.
 - PDF output hides editing controls before export to keep the final document clean.
-
-## Future Improvements
-
-- Rename `server.js` to something like `app.js` for clarity
-- Add section deletion controls
-- Add template presets
-- Add autosave for full resume content
-- Add validation for imported JSON
+- Social login requires correct provider setup in the Supabase dashboard before it will work.
 
 ## Copyright
 
-Copyright © 2026 Anis Ghabi. All rights reserved.
+Copyright (c) 2026 Anis Ghabi. All rights reserved.
