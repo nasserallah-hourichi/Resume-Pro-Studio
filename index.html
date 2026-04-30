@@ -15,7 +15,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;600;700&family=Merriweather:wght@400;700&family=Montserrat:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="./css/style.css">
     <!-- ADD this BEFORE your html2pdf script tag -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -228,10 +228,10 @@
                         </div>
                         <div class="workspace-tabs">
                             <button class="workspace-tab active" data-workspace="resume">
-                                <i class="fas fa-file-text"></i> Resume Builder
+                                <i class="fas fa-file-alt"></i> Resume Builder
                             </button>
-                            <button class="workspace-tab" data-workspace="coverletter">
-                                <i class="fas fa-envelope"></i> Cover Letter
+                            <button class="workspace-tab" data-workspace="coverLetter">
+                                <i class="fas fa-envelope"></i> Cover Letter Builder
                             </button>
                         </div>
                     </section>
@@ -421,7 +421,11 @@
     </div>
 
     <script src="supabase-config.js"></script>
-    <script src="server.js"></script>
+    <script type="module" src="./scripts/server.js"></script>
+    <script type="module" src="./helpers/constants.js"></script>
+    <script type="module" src="./helpers/models.js"></script>
+    <script type="module" src="./helpers/translations.js"></script>
+    <script src="./scripts/snow.js"></script>
 </body>
 
 </html>

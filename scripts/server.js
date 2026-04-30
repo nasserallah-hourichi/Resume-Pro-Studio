@@ -1,310 +1,15 @@
-const translations = {
-    en: {
-        fullName: "Anis Ghabi",
-        title: "Software Engineer | Full Stack Developer",
-        phone: "+21690770350",
-        email: "anisghabi8@gmail.com",
-        address: "Calgary, AB, Canada",
-        summaryLabel: "Professional Summary",
-        summaryText: "Software Engineer / Full Stack Developer with 4+ years of experience in building scalable web applications. Specialized in microservices architecture with full mastery of the development lifecycle (frontend, backend, databases). Experienced in integrating LLMs (Gemini, Claude, OpenAI) and automating workflows using n8n (self-hosted) and Zapier. Skilled in web scraping (Playwright), orchestration, APIs, and alerting systems (Telegram bots). Strong background in clean code practices, unit testing, DevOps (Docker, CI/CD), and Agile/Scrum methodologies. Capable of designing and delivering robust, autonomous, data- and AI-driven solutions",
-        experienceLabel: "Work Experience",
-        educationLabel: "Education",
-        skillsLabel: "Core Competencies",
-        languagesLabel: "Languages",
-        footerNote: "Copyright (c) 2026 Anis Ghabi. All rights reserved.",
-        linkedin: "linkedin.com/in/ghabi-anis"
-    },
-    fr: {
-        fullName: "Ghabi Anis",
-        title: "Ingénieur Logiciel | Développeur Full Stack",
-        phone: "+21690770350",
-        email: "anisghabi8@gmail.com",
-        address: "Calgary, AB, Canada",
-        summaryLabel: "Sommaire professionnel",
-        summaryText: "Ingénieur Logiciel / Développeur Full Stack avec 4+ ans d'expérience dans la construction d'applications web évolutives. Spécialisé en architecture microservices avec maîtrise complète du cycle de vie du développement (frontend, backend, bases de données). Expérimenté dans l'intégration de LLMs (Gemini, Claude, OpenAI) et l'automatisation des flux de travail à l'aide de n8n (auto-hébergé) et Zapier. Compétent en scraping web (Playwright), orchestration, APIs, et systèmes d'alerting (bots Telegram). Solide expérience dans les pratiques de code propre, les tests unitaires, DevOps (Docker, CI/CD), et méthodologies Agile/Scrum. Capacité à concevoir et livrer des solutions robustes, autonomes, axées sur les données et l'IA.",
-        experienceLabel: "Experience professionnelle",
-        educationLabel: "Formation",
-        skillsLabel: "Competences cles",
-        languagesLabel: "Langues",
-        footerNote: "Copyright (c) 2026 Anis Ghabi. Tous droits reserves.",
-        linkedin: "linkedin.com/in/ghabi-anis"
-    }
-};
+import { translations } from "../helpers/translations.js";
+import {
+    STORAGE_KEYS,
+    defaultSectionVisibility,
+    defaultResumeCollections,
+    templates,
+    themePresets,
+    baseSectionMeta,
+    presetSectionTemplates
+} from "../helpers/models.js";
+import { RESUMES_TABLE, COVER_LETTERS_TABLE, STORAGE_KEYS_WORKSPACE } from "../helpers/constants.js";
 
-const STORAGE_KEYS = {
-    sectionOrder: "resumeSectionOrder",
-    template: "resumeTemplateSelection",
-    visibility: "resumeSectionVisibility",
-    customSectionCount: "resumeCustomSectionCount",
-    coverLetters: "coverLetters",
-    currentCoverLetterId: "currentCoverLetterId"
-};
-
-const defaultSectionVisibility = {
-    summary: true,
-    experience: true,
-    education: true,
-    skills: true,
-    languages: true
-};
-
-const defaultResumeCollections = {
-    experience: [
-        {
-            position: "Full Stack Developer",
-            company: "Palm.ai",
-            date: "October 2025 – Present",
-            description: "- Redesign and re-architecture of the Palm v2 application using NestJS and React.js. Implementation of a multi-tenant architecture, reducing Azure costs from €4,000 to €300/month (~92%). Set up CI/CD pipelines, environment management with Docker, and automated backups. Integrated automation solutions (n8n) and intelligent processing using LLM APIs to optimize certain workflows. Utilized Azure Blob Storage for file management and designed a scalable, optimized infrastructure."
-        },
-        {
-            position: "Full Stack Developer",
-            company: "QuickText",
-            date: "October 2024 – October 2025",
-            description: "- Responsible for the maintenance, optimization, and evolution of Velma, an AI-powered hotel assistant deployed in over 1,700 hotels. Led a high-traffic platform with strong requirements for performance, scalability, and reliability. - Continuous improvement of user experience and interface performance, delivering robust, maintainable, and quality-focused features. Closely collaborated with product, AI, and operations teams to solve complex issues and optimize the overall architecture. - Design and integration of LLM-based solutions and orchestration of automated workflows (n8n, APIs), contributing to the optimization of operational workflows and an enhanced customer experience."
-        },
-        {
-            position: "Web Development Instructor (Part-Time)",
-            company: "TeachCode",
-            date: "December 2024 – April 2025",
-            description: "- Web Development Mentor, guiding learners on fundamental and advanced modern web concepts. Training in engineering thinking: clean architecture, scalability, testing, and solving real world problems. Practical mentorship with NestJS/Spring Boot (backend) and Angular (frontend). Introduction to modern lightweight frameworks (HonoJS) and serverless architectures. Deployment of applications using Cloudflare Workers. Promoted best practices in API design, project structuring, Git, and CI/CD pipelines."
-        },
-        {
-            position: "Full Stack Developer",
-            company: "TekabDev",
-            date: "June 2022 – October 2024",
-            description: "- Designed an edge-optimized code generation platform (Cloudflare) enabling automatic creation of production-ready projects (Spring Boot / Angular) with DTO generation via OpenAPI (API-First approach). - Developed a full-stack platform (GraphQL, UI) with LLM integration (Gemini, Claude, OpenAI) for intelligent code generation and workflow optimization. Implemented automated workflows (n8n, Zapier) for process orchestration, code generation, data processing, and task automation. Implemented CI/CD v2 (Docker, Kubernetes), reducing deployment effort by ~80%. Designed a distributed microservices architecture supporting ~50k concurrent users with low latency. Managed PostgreSQL migrations and deployed a self-service GraphQL platform, reducing infrastructure code by ~35%."
-        },
-        {
-            position: "Frontend Developer (Internship)",
-            company: "Beenomi",
-            date: "April 2022 – June 2022",
-            description: "- Complete redesign of the Beenomi application using Java Spring Boot (backend) and React.js (frontend). Improved and optimized the platform for better performance and scalability. Redesigned the user interface for a more modern and intuitive experience. Implemented development best practices and enhanced code maintainability."
-        },
-        {
-            position: "Full Stack Developer (Internship)",
-            company: "ASM - All Soft Multimedia",
-            date: "February 2022 – June 2022",
-            description: "- Developed an HR management system using Angular and Laravel.  - Collaborative work using Agile/Scrum methodology: participated in sprints and Scrum ceremonies, coordinated with product and design teams, prioritized tasks, tracked progress, and delivered incremental features, while promoting continuous improvement."
-        },
-        {
-            position: "Full Stack Developer (Internship)",
-            company: "ASM - All Soft Multimedia",
-            date: "July 2021 – August 2021",
-            description: "- Developed a fleet management system using Angular and Laravel.  - Created modules for fleet management and analytical reporting. Contributed to a hybrid production system, ensuring performance and reliability."
-        }
-    ],
-    education: [
-        {
-            degree: "National Engineering Degree in Computer Science",
-            date: "2022 – 2025 | Private Polytechnic Institute of Advanced Sciences of Sfax"
-        },
-        {
-            degree: "Bachelor’s Degree in Computer Science and Multimedia",
-            date: "2019 – 2022 | Higher Institute of Computer Science and Multimedia of Sfax"
-        }
-    ],
-    skills: [
-        "Java",
-        "NestJs",
-        "Spring Boot",
-        "Laravel",
-        "GraphQL",
-        "RabbitMQ",
-        "Apache JMeter",
-        "PostgreSQL",
-        "MySQL",
-        "MongoDB",
-        "ElasticSearch",
-        "Docker",
-        "Kubernetes (K8S)",
-        "Azure Cloud",
-        "Cloudflare",
-        "Git",
-        "Prometheus",
-        "Kibana",
-        "Grafana",
-        "Nginx",
-        "Zapier",
-        "N8N",
-        "Serverless",
-        "Redis",
-        "BullMQ",
-        "Angular",
-        "ReactJs",
-        "NextJs",
-        "JUnit",
-        "Jest",
-        "Selenium",
-        "Playwright",
-        "Gemini",
-        "Claude",
-        "(LLM APIs)",
-        "Docker Model Runner",
-        "Recommendation Systems",
-        "M2"
-    ],
-    languages: [
-        {
-            name: "English",
-            level: "Professional working proficiency (B2)"
-        },
-        {
-            name: "French",
-            level: "Professional working proficiency (B2)"
-        }
-    ]
-};
-
-const templates = [
-    {
-        id: "classic",
-        name: "Classic Professional",
-        description: "Balanced spacing and a timeless single-column resume.",
-        preview: ["Centered header", "Clean section rules"],
-        controls: {
-            globalFontSelect: "'Inter', sans-serif",
-            baseFontSize: "14px",
-            sectionTitleColor: "#0f172a",
-            textColor: "#1e293b",
-            nameColor: "#0f172a",
-            headlineColor: "#334155",
-            expTitleColor: "#0f172a",
-            companyColor: "#475569",
-            dateColor: "#64748b",
-            sectionTitleSize: "0.9rem",
-            skillsColumnsSelect: "3"
-        }
-    },
-    {
-        id: "executive",
-        name: "Executive Slate",
-        description: "Left-aligned and refined with strong hierarchy.",
-        preview: ["Editorial heading", "Refined experience blocks"],
-        controls: {
-            globalFontSelect: "'Merriweather', serif",
-            baseFontSize: "14px",
-            sectionTitleColor: "#12344d",
-            textColor: "#263645",
-            nameColor: "#12344d",
-            headlineColor: "#425d74",
-            expTitleColor: "#0f2740",
-            companyColor: "#5b7085",
-            dateColor: "#71869a",
-            sectionTitleSize: "0.85rem",
-            skillsColumnsSelect: "2"
-        }
-    },
-    // {
-    //     id: "modern",
-    //     name: "Modern Accent",
-    //     description: "High-contrast header with a polished studio feel.",
-    //     preview: ["Accent header", "Sharper visual rhythm"],
-    //     controls: {
-    //         globalFontSelect: "'Montserrat', sans-serif",
-    //         baseFontSize: "14px",
-    //         sectionTitleColor: "#0b3b66",
-    //         textColor: "#243647",
-    //         nameColor: "#f8fafc",
-    //         headlineColor: "#dbe7f3",
-    //         expTitleColor: "#0b3b66",
-    //         companyColor: "#4f6980",
-    //         dateColor: "#6b7f93",
-    //         sectionTitleSize: "0.9rem",
-    //         skillsColumnsSelect: "3"
-    //     }
-    // },
-    {
-        id: "compact",
-        name: "Compact ATS",
-        description: "Dense, efficient, and optimized for space.",
-        preview: ["Tighter spacing", "High-information layout"],
-        controls: {
-            globalFontSelect: "'Roboto', sans-serif",
-            baseFontSize: "13px",
-            sectionTitleColor: "#111827",
-            textColor: "#1f2937",
-            nameColor: "#111827",
-            headlineColor: "#4b5563",
-            expTitleColor: "#111827",
-            companyColor: "#4b5563",
-            dateColor: "#6b7280",
-            sectionTitleSize: "0.85rem",
-            skillsColumnsSelect: "4"
-        }
-    }
-];
-
-const themePresets = [
-    {
-        id: "navy",
-        name: "Navy",
-        colors: {
-            sectionTitleColor: "#0f172a",
-            textColor: "#1e293b",
-            nameColor: "#0f172a",
-            headlineColor: "#334155",
-            expTitleColor: "#0f172a",
-            companyColor: "#475569",
-            dateColor: "#64748b"
-        }
-    },
-    {
-        id: "emerald",
-        name: "Emerald",
-        colors: {
-            sectionTitleColor: "#14532d",
-            textColor: "#1f2937",
-            nameColor: "#14532d",
-            headlineColor: "#2f6b4f",
-            expTitleColor: "#14532d",
-            companyColor: "#3f6f5d",
-            dateColor: "#5f7b72"
-        }
-    },
-    {
-        id: "burgundy",
-        name: "Burgundy",
-        colors: {
-            sectionTitleColor: "#6b1124",
-            textColor: "#2f1d22",
-            nameColor: "#6b1124",
-            headlineColor: "#8a3649",
-            expTitleColor: "#6b1124",
-            companyColor: "#7e5360",
-            dateColor: "#9a6e78"
-        }
-    }
-];
-
-const baseSectionMeta = [
-    { id: "summary", label: "Summary" },
-    { id: "experience", label: "Experience" },
-    { id: "education", label: "Education" },
-    { id: "skills", label: "Skills" },
-    { id: "languages", label: "Languages" }
-];
-
-const presetSectionTemplates = {
-    projects: {
-        title: "Projects",
-        content: "Project Name\n- What you built\n- Stack used\n- Outcome or measurable impact"
-    },
-    certifications: {
-        title: "Certifications",
-        content: "Certification Name - Issuing Organization - Year"
-    },
-    awards: {
-        title: "Awards",
-        content: "Award Title - Organization - Why it mattered"
-    },
-    volunteer: {
-        title: "Volunteer Work",
-        content: "Organization / Role\n- Contribution\n- Impact"
-    }
-};
-
-const RESUMES_TABLE = "resumes";
-const COVER_LETTERS_TABLE = "cover_letters";
 
 let currentLang = "en";
 let currentResumeData = null;
@@ -335,6 +40,7 @@ let coverLetterAutosaveTimer = null;
 let coverLetterIsDirty = false;
 let coverLetterIsSaving = false;
 let showAllCoverLetters = false;
+let showAllResumes = false;
 
 const dom = {};
 
@@ -353,6 +59,16 @@ function getSeedResumeData(lang) {
         photoUrl: "",
         showPhoto: false
     };
+}
+
+
+function saveWorkspacePreference(workspace) {
+    localStorage.setItem(STORAGE_KEYS_WORKSPACE, workspace);
+}
+
+function loadWorkspacePreference() {
+    const saved = localStorage.getItem(STORAGE_KEYS_WORKSPACE);
+    return saved === "coverLetter" ? "coverLetter" : "resume"; // Default to resume
 }
 
 function cloneResumeData(data, lang = currentLang) {
@@ -1082,7 +798,12 @@ function renderResumeLibrary() {
     if (!dom.resumeLibraryList || !dom.resumeLibraryEmpty) return;
 
     dom.resumeLibraryEmpty.classList.toggle("hidden", resumeLibrary.length > 0);
-    dom.resumeLibraryList.innerHTML = resumeLibrary.map((record) => `
+
+    const itemsToShow = showAllResumes ? resumeLibrary.length : Math.min(2, resumeLibrary.length);
+    const visibleItems = resumeLibrary.slice(0, itemsToShow);
+    const hasMore = resumeLibrary.length > 2;
+
+    let html = visibleItems.map((record) => `
         <article class="resume-library-card ${record.id === currentResumeId ? "active" : ""}" data-resume-id="${record.id}">
             <div class="resume-library-head">
                 <div>
@@ -1098,6 +819,29 @@ function renderResumeLibrary() {
             </div>
         </article>
     `).join("");
+
+    if (hasMore && !showAllResumes) {
+        html += `<button class="show-more-btn" onclick="toggleShowAllResumes()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+            ${resumeLibrary.length - 2} more resume${resumeLibrary.length - 2 > 1 ? "s" : ""}
+        </button>`;
+    } else if (hasMore && showAllResumes) {
+        html += `<button class="show-more-btn" onclick="toggleShowAllResumes()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="18 15 12 9 6 15"></polyline>
+            </svg>
+            Show less
+        </button>`;
+    }
+
+    dom.resumeLibraryList.innerHTML = html;
+}
+
+function toggleShowAllResumes() {
+    showAllResumes = !showAllResumes;
+    renderResumeLibrary();
 }
 
 function syncCurrentRecordInLibrary(patch = {}) {
@@ -1832,6 +1576,50 @@ async function handleOAuthSignIn(provider) {
     }
 }
 
+function updateCoverLetterSaveStatus(coverLetterId, message, type = "info") {
+    console.log("Updating save status for:", coverLetterId, message, type); // Debug log
+
+    const statusEl = document.getElementById(`save-status-${coverLetterId}`);
+    if (statusEl) {
+        console.log("Found status element:", statusEl); // Debug log
+
+        statusEl.textContent = message;
+        statusEl.style.display = "inline-flex";
+
+        // Remove previous type classes
+        statusEl.classList.remove("saving", "saved", "error", "info");
+
+        // Add type class for styling
+        if (type === "saving") {
+            statusEl.classList.add("saving");
+        } else if (type === "saved") {
+            statusEl.classList.add("saved");
+            // Clear saved message after 2 seconds
+            setTimeout(() => {
+                if (statusEl.textContent === message) {
+                    statusEl.style.display = "none";
+                }
+            }, 2000);
+        } else if (type === "error") {
+            statusEl.classList.add("error");
+            // Keep error visible longer
+            setTimeout(() => {
+                statusEl.style.display = "none";
+            }, 4000);
+        } else if (type === "info") {
+            statusEl.classList.add("info");
+            // Clear info messages after 3 seconds
+            setTimeout(() => {
+                if (statusEl.textContent === message) {
+                    statusEl.style.display = "none";
+                }
+            }, 3000);
+        }
+    } else {
+        console.error("Status element not found for ID:", `save-status-${coverLetterId}`);
+    }
+}
+
 async function handleSignOut() {
     if (!supabaseClient) {
         applySessionState(null);
@@ -1891,6 +1679,59 @@ function bindSidebarEvents() {
     document.querySelectorAll("[data-preset-section]").forEach((button) => {
         button.addEventListener("click", () => addPresetSection(button.getAttribute("data-preset-section")));
     });
+}
+
+
+async function deleteCoverLetter(coverLetterId) {
+    if (!coverLetterId) return;
+
+    // Find the cover letter to delete
+    const target = coverLetterLibrary.find(cl => cl.id === coverLetterId);
+    const confirmed = window.confirm(`Delete "${target?.title || 'this cover letter'}"? This action cannot be undone.`);
+    if (!confirmed) return;
+
+    // If user is logged in, delete from Supabase
+    if (supabaseClient && currentUser) {
+        const { error } = await supabaseClient
+            .from(COVER_LETTERS_TABLE)
+            .delete()
+            .eq("id", coverLetterId);
+
+        if (error) {
+            showToast(error.message || "Unable to delete cover letter.", "error");
+            return;
+        }
+    } else {
+        // Offline mode: delete from localStorage
+        delete coverLetters[coverLetterId];
+        saveCoverLetterToStorage();
+    }
+
+    // Remove from library array
+    coverLetterLibrary = coverLetterLibrary.filter(cl => cl.id !== coverLetterId);
+
+    // If we're deleting the currently open cover letter, clear it
+    if (coverLetterId === currentCoverLetterId) {
+        currentCoverLetterId = null;
+        currentCoverLetterData = null;
+
+        // Clear the UI
+        const titleInput = document.getElementById("coverLetterTitleInput");
+        const jobDescInput = document.getElementById("jobDescriptionInput");
+        const container = document.getElementById("coverLetterContainer");
+
+        if (titleInput) titleInput.value = "";
+        if (jobDescInput) jobDescInput.value = "";
+        if (container) {
+            container.contentEditable = "false";
+            container.innerHTML = `<p style="color: #94a3b8; text-align: center; padding: 40px;">Select a cover letter from the list or create a new one to get started.</p>`;
+        }
+
+        updateSaveStatus("Cover letter deleted");
+    }
+
+    renderCoverLetterList();
+    showToast("Cover letter deleted.", "success");
 }
 
 function bindStyleControls() {
@@ -2013,9 +1854,15 @@ async function loadCoverLetterLibrary() {
 }
 
 async function saveCurrentCoverLetterToCloud(options = {}) {
+    console.log("saveCurrentCoverLetterToCloud called", {
+        hasClient: !!supabaseClient,
+        hasUser: !!currentUser,
+        hasId: !!currentCoverLetterId
+    });
+
     if (!supabaseClient || !currentUser || !currentCoverLetterId) {
         if (!options.silent) {
-            showToast("Create a cover letter first before saving.", "error");
+            showToast(!currentUser ? "Sign in to save cover letters to cloud." : "Create a cover letter first before saving.", "error");
         }
         return;
     }
@@ -2023,13 +1870,19 @@ async function saveCurrentCoverLetterToCloud(options = {}) {
     if (coverLetterIsSaving && !options.force) return;
     coverLetterIsSaving = true;
 
+    // Show saving indicator on the specific cover letter card
+    console.log("Showing saving status for:", currentCoverLetterId);
+    updateCoverLetterSaveStatus(currentCoverLetterId, "Saving...", "saving");
+
     try {
         const payload = {
             title: document.getElementById("coverLetterTitleInput")?.value || "Untitled Cover Letter",
             job_description: document.getElementById("jobDescriptionInput")?.value || "",
-            content: document.getElementById("coverLetterContainer")?.textContent || "",
+            content: document.getElementById("coverLetterContainer")?.innerText || document.getElementById("coverLetterContainer")?.textContent || "",
             updated_at: new Date().toISOString()
         };
+
+        console.log("Saving payload:", payload);
 
         const { data, error } = await supabaseClient
             .from(COVER_LETTERS_TABLE)
@@ -2052,11 +1905,19 @@ async function saveCurrentCoverLetterToCloud(options = {}) {
         syncCurrentCoverLetterInLibrary(currentCoverLetterData);
         coverLetterIsDirty = false;
 
-        if (!options.silent) {
+        // Show saved successfully on the card
+        if (options.silent) {
+            updateCoverLetterSaveStatus(currentCoverLetterId, "Saved", "saved");
+        } else {
+            updateCoverLetterSaveStatus(currentCoverLetterId, "Saved!", "saved");
             showToast("Cover letter saved to cloud.", "success");
         }
     } catch (error) {
-        showToast(error.message || "Cloud save failed.", "error");
+        console.error("Save error:", error);
+        updateCoverLetterSaveStatus(currentCoverLetterId, "⚠️ Save failed", "error");
+        if (!options.silent) {
+            showToast(error.message || "Cloud save failed.", "error");
+        }
     } finally {
         coverLetterIsSaving = false;
     }
@@ -2064,15 +1925,38 @@ async function saveCurrentCoverLetterToCloud(options = {}) {
 
 function scheduleCoverLetterAutosave() {
     if (!currentUser || !currentCoverLetterId) return;
-    window.clearTimeout(coverLetterAutosaveTimer);
+
+    // Clear existing timer
+    if (coverLetterAutosaveTimer) {
+        window.clearTimeout(coverLetterAutosaveTimer);
+    }
+
+    // Show pending auto-save indicator on the card
+    updateCoverLetterSaveStatus(currentCoverLetterId, "Saving...", "info");
+
+    // Set new timer - save after 1.5 seconds of no typing
     coverLetterAutosaveTimer = window.setTimeout(() => {
-        saveCurrentCoverLetterToCloud({ silent: true });
-    }, 1400);
+        if (coverLetterIsDirty && currentCoverLetterId) {
+            saveCurrentCoverLetterToCloud({ silent: true });
+        }
+        coverLetterAutosaveTimer = null;
+    }, 1500);
 }
 
 function markCoverLetterDirty(statusMessage = "Unsaved changes") {
+    if (!coverLetterIsDirty) {
+        // Only show this when it becomes dirty
+        updateCoverLetterSaveStatus("Unsaved changes", "info");
+    }
     coverLetterIsDirty = true;
     scheduleCoverLetterAutosave();
+
+    // Optional: Change the tab title or add an indicator
+    const titleInput = document.getElementById("coverLetterTitleInput");
+    if (titleInput && titleInput.value && !titleInput.value.includes("•")) {
+        // Don't modify the actual title, just show indicator in UI elsewhere
+        document.title = "• " + document.title.replace(/^•\s*/, "");
+    }
 }
 
 async function createCoverLetterRecord() {
@@ -2130,7 +2014,11 @@ function syncCurrentCoverLetterInLibrary(coverLetter) {
 }
 
 function switchWorkspace(workspace) {
+    console.log("Switching workspace to:", workspace);
     currentWorkspace = workspace;
+
+    // Save to localStorage
+    saveWorkspacePreference(workspace);
 
     // Update tabs
     document.querySelectorAll(".workspace-tab").forEach((tab) => {
@@ -2143,24 +2031,34 @@ function switchWorkspace(workspace) {
     const resumeStage = document.getElementById("resumeStage");
     const coverLetterStage = document.getElementById("coverLetterStage");
     const designPanel = document.querySelector(".design-panel");
+
     if (workspace === "resume") {
         if (resumePanel) resumePanel.hidden = false;
         if (coverLetterPanel) coverLetterPanel.hidden = true;
         if (resumeStage) resumeStage.classList.remove("hidden");
         if (coverLetterStage) coverLetterStage.classList.add("hidden");
-        if (designPanel) designPanel.classList.remove("hidden")
+        if (designPanel) designPanel.classList.remove("hidden");
     } else {
         if (resumePanel) resumePanel.hidden = true;
         if (coverLetterPanel) coverLetterPanel.hidden = false;
         if (resumeStage) resumeStage.classList.add("hidden");
         if (coverLetterStage) coverLetterStage.classList.remove("hidden");
-        if (designPanel) designPanel.classList.add("hidden")
-        if (currentUser) {
+        if (designPanel) designPanel.classList.add("hidden");
+        
+        // Only load cover letters if needed and user is logged in
+        if (currentUser && coverLetterLibrary.length === 0) {
             loadCoverLetterLibrary();
-        } else {
+        } else if (!currentUser) {
             renderCoverLetterList();
         }
     }
+}
+
+function debugWorkspaceState() {
+    console.log("Current workspace:", currentWorkspace);
+    console.log("Saved workspace:", localStorage.getItem(STORAGE_KEYS_WORKSPACE));
+    console.log("Resume panel hidden:", document.getElementById("resumeWorkspacePanel")?.hidden);
+    console.log("Cover letter panel hidden:", document.getElementById("coverLetterWorkspacePanel")?.hidden);
 }
 
 function generateCoverLetterContent() {
@@ -2353,9 +2251,17 @@ function renderCoverLetterList() {
     const hasMore = coverLetterLibrary.length > 2;
 
     let html = visibleItems.map(cl => `
-        <div class="cover-letter-item ${currentCoverLetterId === cl.id ? 'active' : ''}" onclick="loadCoverLetter('${escapeAttribute(cl.id)}')">
-            <div class="cover-letter-item-title">${escapeHtml(cl.title)}</div>
-            <div class="cover-letter-item-meta">Updated ${new Date(cl.updatedAt).toLocaleDateString()}</div>
+        <div class="cover-letter-item ${currentCoverLetterId === cl.id ? 'active' : ''}" data-cover-letter-id="${escapeAttribute(cl.id)}" id="cover-letter-${escapeAttribute(cl.id)}">
+            <div class="cover-letter-item-content" onclick="loadCoverLetter('${escapeAttribute(cl.id)}')">
+                <div class="cover-letter-item-title">${escapeHtml(cl.title)}</div>
+                <div class="cover-letter-item-meta">Updated ${new Date(cl.updatedAt).toLocaleDateString()}</div>
+            </div>
+            <div class="cover-letter-item-actions">
+                <span class="cover-letter-save-status" id="save-status-${escapeAttribute(cl.id)}" style="display: none;"></span>
+                <button class="cover-letter-delete-btn" data-delete-cover-letter="${escapeAttribute(cl.id)}" title="Delete cover letter">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
         </div>
     `).join("");
 
@@ -2371,16 +2277,37 @@ function renderCoverLetterList() {
     }
 
     list.innerHTML = html;
-}
 
+    // Attach delete event listeners
+    list.querySelectorAll("[data-delete-cover-letter]").forEach((button) => {
+        button.addEventListener("click", (event) => {
+            event.stopPropagation(); // Prevent triggering the parent click
+            const id = button.getAttribute("data-delete-cover-letter");
+            if (id) deleteCoverLetter(id);
+        });
+    });
+}
 function toggleShowAllCoverLetters() {
     showAllCoverLetters = !showAllCoverLetters;
     renderCoverLetterList();
 }
 
+function testSaveStatus(coverLetterId) {
+    console.log("Testing save status for:", coverLetterId);
+    updateCoverLetterSaveStatus(coverLetterId, "Test saving...", "saving");
+    setTimeout(() => {
+        updateCoverLetterSaveStatus(coverLetterId, "Test saved!", "saved");
+    }, 2000);
+}
+
 function loadCoverLetter(id) {
     const coverLetter = coverLetterLibrary.find(cl => cl.id === id);
     if (!coverLetter) return;
+
+    // Clear status for the previous cover letter
+    if (currentCoverLetterId) {
+        updateCoverLetterSaveStatus(currentCoverLetterId, "", "info");
+    }
 
     currentCoverLetterId = id;
     currentCoverLetterData = coverLetter;
@@ -2389,12 +2316,9 @@ function loadCoverLetter(id) {
 
     const container = document.getElementById("coverLetterContainer");
     if (container) {
-        // Format the content as HTML with proper paragraph breaks
         container.innerHTML = formatCoverLetterHTML(coverLetter.content);
-        // Make it editable
         container.contentEditable = "true";
         container.setAttribute("data-editable", "true");
-        container.addEventListener("blur", saveCoverLetterOnEdit);
     }
 
     renderCoverLetterList();
@@ -2562,7 +2486,6 @@ function bindStudioEvents() {
     document.querySelectorAll(".workspace-tab").forEach((tab) => {
         tab.addEventListener("click", () => {
             switchWorkspace(tab.dataset.workspace);
-
         });
     });
 
@@ -2662,7 +2585,53 @@ function bindStudioEvents() {
             }
         }
     });
+
+    // Cover Letter Content Editable - Autosave on input
+    const coverLetterContainer = document.getElementById("coverLetterContainer");
+    if (coverLetterContainer) {
+        // Add input event listener for content changes
+        coverLetterContainer.addEventListener("input", () => {
+            if (currentCoverLetterData && currentCoverLetterId) {
+                // Update content in currentCoverLetterData
+                currentCoverLetterData.content = coverLetterContainer.innerText || coverLetterContainer.textContent || "";
+                markCoverLetterDirty("Editing cover letter");
+            }
+        });
+
+        // Also listen for blur events to ensure save
+        coverLetterContainer.addEventListener("blur", () => {
+            if (coverLetterIsDirty && currentCoverLetterId) {
+                saveCurrentCoverLetterToCloud({ silent: true });
+            }
+        });
+    }
+
+    // Cover Letter Title Autosave
+    const coverLetterTitleInput = document.getElementById("coverLetterTitleInput");
+    if (coverLetterTitleInput) {
+        coverLetterTitleInput.addEventListener("input", () => {
+            if (currentCoverLetterData && currentCoverLetterId) {
+                currentCoverLetterData.title = coverLetterTitleInput.value;
+                markCoverLetterDirty("Title updated");
+                syncCurrentCoverLetterInLibrary(currentCoverLetterData);
+            }
+        });
+    }
+
+    // Job Description Autosave
+    const jobDescriptionInput = document.getElementById("jobDescriptionInput");
+    if (jobDescriptionInput) {
+        jobDescriptionInput.addEventListener("input", () => {
+            if (currentCoverLetterData && currentCoverLetterId) {
+                currentCoverLetterData.jobDescription = jobDescriptionInput.value;
+                markCoverLetterDirty("Job description updated");
+            }
+        });
+    }
 }
+
+
+
 
 async function hydrateAuthSession() {
     if (!supabaseClient) {
@@ -2688,6 +2657,17 @@ function maybeShowConfigHint() {
     setAuthStatus("Supabase is not configured yet. Update supabase-config.js with your project URL and anon key.", "error");
 }
 
+
+window.loadCoverLetter = loadCoverLetter;
+window.toggleShowAllCoverLetters = toggleShowAllCoverLetters;
+window.createNewCoverLetter = createNewCoverLetter;
+window.saveCoverLetterPDF = saveCoverLetterPDF;
+window.generateCleanPDF = generateCleanPDF;
+window.copyCoverLetterText = copyCoverLetterText;
+window.resetCoverLetter = resetCoverLetter;
+window.debugPDFCapture = debugPDFCapture;
+window.toggleShowAllResumes = toggleShowAllResumes;
+
 document.addEventListener("DOMContentLoaded", async () => {
     cacheDom();
     setAuthMode("login");
@@ -2708,674 +2688,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (currentUser) {
         await loadCoverLetterLibrary();
     }
+
+    // IMPORTANT: Restore workspace AFTER all loading is complete
+    // Use setTimeout to ensure DOM is fully updated
+    setTimeout(() => {
+        const savedWorkspace = loadWorkspacePreference();
+        console.log("Restoring workspace to:", savedWorkspace);
+        switchWorkspace(savedWorkspace);
+        debugWorkspaceState();
+    }, 100);
 });
-
-
-// snow 
-/** @license
- * DHTML Snowstorm! JavaScript-based snow for web pages
- * Making it snow on the internets since 2003. You're welcome.
- * -----------------------------------------------------------
- * Version 1.44.20131208 (Previous rev: 1.44.20131125)
- * Copyright (c) 2007, Scott Schiller. All rights reserved.
- * Code provided under the BSD License
- * http://schillmania.com/projects/snowstorm/license.txt
- */
-
-/*jslint nomen: true, plusplus: true, sloppy: true, vars: true, white: true */
-/*global window, document, navigator, clearInterval, setInterval */
-
-var snowStorm = (function(window, document) {
-
-  // --- common properties ---
-
-  this.autoStart = true;          // Whether the snow should start automatically or not.
-  this.excludeMobile = true;      // Snow is likely to be bad news for mobile phones' CPUs (and batteries.) Enable at your own risk.
-  this.flakesMax = 128;           // Limit total amount of snow made (falling + sticking)
-  this.flakesMaxActive = 64;      // Limit amount of snow falling at once (less = lower CPU use)
-  this.animationInterval = 50;    // Theoretical "miliseconds per frame" measurement. 20 = fast + smooth, but high CPU use. 50 = more conservative, but slower
-  this.useGPU = true;             // Enable transform-based hardware acceleration, reduce CPU load.
-  this.className = null;          // CSS class name for further customization on snow elements
-  this.excludeMobile = true;      // Snow is likely to be bad news for mobile phones' CPUs (and batteries.) By default, be nice.
-  this.flakeBottom = null;        // Integer for Y axis snow limit, 0 or null for "full-screen" snow effect
-  this.followMouse = false;        // Snow movement can respond to the user's mouse
-  this.snowColor = '#301934';        // Don't eat (or use?) yellow snow.
-  this.snowCharacter = '&bull;';  // &bull; = bullet, &middot; is square on some systems etc.
-  this.snowStick = true;          // Whether or not snow should "stick" at the bottom. When off, will never collect.
-  this.targetElement = null;      // element which snow will be appended to (null = document.body) - can be an element ID eg. 'myDiv', or a DOM node reference
-  this.useMeltEffect = true;      // When recycling fallen snow (or rarely, when falling), have it "melt" and fade out if browser supports it
-  this.useTwinkleEffect = false;  // Allow snow to randomly "flicker" in and out of view while falling
-  this.usePositionFixed = false;  // true = snow does not shift vertically when scrolling. May increase CPU load, disabled by default - if enabled, used only where supported
-  this.usePixelPosition = false;  // Whether to use pixel values for snow top/left vs. percentages. Auto-enabled if body is position:relative or targetElement is specified.
-
-  // --- less-used bits ---
-
-  this.freezeOnBlur = true;       // Only snow when the window is in focus (foreground.) Saves CPU.
-  this.flakeLeftOffset = 0;       // Left margin/gutter space on edge of container (eg. browser window.) Bump up these values if seeing horizontal scrollbars.
-  this.flakeRightOffset = 0;      // Right margin/gutter space on edge of container
-  this.flakeWidth = 8;            // Max pixel width reserved for snow element
-  this.flakeHeight = 8;           // Max pixel height reserved for snow element
-  this.vMaxX = 5;                 // Maximum X velocity range for snow
-  this.vMaxY = 4;                 // Maximum Y velocity range for snow
-  this.zIndex = 0;                // CSS stacking order applied to each snowflake
-
-  // --- "No user-serviceable parts inside" past this point, yadda yadda ---
-
-  var storm = this,
-  features,
-  // UA sniffing and backCompat rendering mode checks for fixed position, etc.
-  isIE = navigator.userAgent.match(/msie/i),
-  isIE6 = navigator.userAgent.match(/msie 6/i),
-  isMobile = navigator.userAgent.match(/mobile|opera m(ob|in)/i),
-  isBackCompatIE = (isIE && document.compatMode === 'BackCompat'),
-  noFixed = (isBackCompatIE || isIE6),
-  screenX = null, screenX2 = null, screenY = null, scrollY = null, docHeight = null, vRndX = null, vRndY = null,
-  windOffset = 1,
-  windMultiplier = 2,
-  flakeTypes = 6,
-  fixedForEverything = false,
-  targetElementIsRelative = false,
-  opacitySupported = (function(){
-    try {
-      document.createElement('div').style.opacity = '0.5';
-    } catch(e) {
-      return false;
-    }
-    return true;
-  }()),
-  didInit = false,
-  docFrag = document.createDocumentFragment();
-
-  features = (function() {
-
-    var getAnimationFrame;
-
-    /**
-     * hat tip: paul irish
-     * http://paulirish.com/2011/requestanimationframe-for-smart-animating/
-     * https://gist.github.com/838785
-     */
-
-    function timeoutShim(callback) {
-      window.setTimeout(callback, 1000/(storm.animationInterval || 20));
-    }
-
-    var _animationFrame = (window.requestAnimationFrame ||
-        window.webkitRequestAnimationFrame ||
-        window.mozRequestAnimationFrame ||
-        window.oRequestAnimationFrame ||
-        window.msRequestAnimationFrame ||
-        timeoutShim);
-
-    // apply to window, avoid "illegal invocation" errors in Chrome
-    getAnimationFrame = _animationFrame ? function() {
-      return _animationFrame.apply(window, arguments);
-    } : null;
-
-    var testDiv;
-
-    testDiv = document.createElement('div');
-
-    function has(prop) {
-
-      // test for feature support
-      var result = testDiv.style[prop];
-      return (result !== undefined ? prop : null);
-
-    }
-
-    // note local scope.
-    var localFeatures = {
-
-      transform: {
-        ie:  has('-ms-transform'),
-        moz: has('MozTransform'),
-        opera: has('OTransform'),
-        webkit: has('webkitTransform'),
-        w3: has('transform'),
-        prop: null // the normalized property value
-      },
-
-      getAnimationFrame: getAnimationFrame
-
-    };
-
-    localFeatures.transform.prop = (
-      localFeatures.transform.w3 || 
-      localFeatures.transform.moz ||
-      localFeatures.transform.webkit ||
-      localFeatures.transform.ie ||
-      localFeatures.transform.opera
-    );
-
-    testDiv = null;
-
-    return localFeatures;
-
-  }());
-
-  this.timer = null;
-  this.flakes = [];
-  this.disabled = false;
-  this.active = false;
-  this.meltFrameCount = 20;
-  this.meltFrames = [];
-
-  this.setXY = function(o, x, y) {
-
-    if (!o) {
-      return false;
-    }
-
-    if (storm.usePixelPosition || targetElementIsRelative) {
-
-      o.style.left = (x - storm.flakeWidth) + 'px';
-      o.style.top = (y - storm.flakeHeight) + 'px';
-
-    } else if (noFixed) {
-
-      o.style.right = (100-(x/screenX*100)) + '%';
-      // avoid creating vertical scrollbars
-      o.style.top = (Math.min(y, docHeight-storm.flakeHeight)) + 'px';
-
-    } else {
-
-      if (!storm.flakeBottom) {
-
-        // if not using a fixed bottom coordinate...
-        o.style.right = (100-(x/screenX*100)) + '%';
-        o.style.bottom = (100-(y/screenY*100)) + '%';
-
-      } else {
-
-        // absolute top.
-        o.style.right = (100-(x/screenX*100)) + '%';
-        o.style.top = (Math.min(y, docHeight-storm.flakeHeight)) + 'px';
-
-      }
-
-    }
-
-  };
-
-  this.events = (function() {
-
-    var old = (!window.addEventListener && window.attachEvent), slice = Array.prototype.slice,
-    evt = {
-      add: (old?'attachEvent':'addEventListener'),
-      remove: (old?'detachEvent':'removeEventListener')
-    };
-
-    function getArgs(oArgs) {
-      var args = slice.call(oArgs), len = args.length;
-      if (old) {
-        args[1] = 'on' + args[1]; // prefix
-        if (len > 3) {
-          args.pop(); // no capture
-        }
-      } else if (len === 3) {
-        args.push(false);
-      }
-      return args;
-    }
-
-    function apply(args, sType) {
-      var element = args.shift(),
-          method = [evt[sType]];
-      if (old) {
-        element[method](args[0], args[1]);
-      } else {
-        element[method].apply(element, args);
-      }
-    }
-
-    function addEvent() {
-      apply(getArgs(arguments), 'add');
-    }
-
-    function removeEvent() {
-      apply(getArgs(arguments), 'remove');
-    }
-
-    return {
-      add: addEvent,
-      remove: removeEvent
-    };
-
-  }());
-
-  function rnd(n,min) {
-    if (isNaN(min)) {
-      min = 0;
-    }
-    return (Math.random()*n)+min;
-  }
-
-  function plusMinus(n) {
-    return (parseInt(rnd(2),10)===1?n*-1:n);
-  }
-
-  this.randomizeWind = function() {
-    var i;
-    vRndX = plusMinus(rnd(storm.vMaxX,0.2));
-    vRndY = rnd(storm.vMaxY,0.2);
-    if (this.flakes) {
-      for (i=0; i<this.flakes.length; i++) {
-        if (this.flakes[i].active) {
-          this.flakes[i].setVelocities();
-        }
-      }
-    }
-  };
-
-  this.scrollHandler = function() {
-    var i;
-    // "attach" snowflakes to bottom of window if no absolute bottom value was given
-    scrollY = (storm.flakeBottom ? 0 : parseInt(window.scrollY || document.documentElement.scrollTop || (noFixed ? document.body.scrollTop : 0), 10));
-    if (isNaN(scrollY)) {
-      scrollY = 0; // Netscape 6 scroll fix
-    }
-    if (!fixedForEverything && !storm.flakeBottom && storm.flakes) {
-      for (i=0; i<storm.flakes.length; i++) {
-        if (storm.flakes[i].active === 0) {
-          storm.flakes[i].stick();
-        }
-      }
-    }
-  };
-
-  this.resizeHandler = function() {
-    if (window.innerWidth || window.innerHeight) {
-      screenX = window.innerWidth - 16 - storm.flakeRightOffset;
-      screenY = (storm.flakeBottom || window.innerHeight);
-    } else {
-      screenX = (document.documentElement.clientWidth || document.body.clientWidth || document.body.scrollWidth) - (!isIE ? 8 : 0) - storm.flakeRightOffset;
-      screenY = storm.flakeBottom || document.documentElement.clientHeight || document.body.clientHeight || document.body.scrollHeight;
-    }
-    docHeight = document.body.offsetHeight;
-    screenX2 = parseInt(screenX/2,10);
-  };
-
-  this.resizeHandlerAlt = function() {
-    screenX = storm.targetElement.offsetWidth - storm.flakeRightOffset;
-    screenY = storm.flakeBottom || storm.targetElement.offsetHeight;
-    screenX2 = parseInt(screenX/2,10);
-    docHeight = document.body.offsetHeight;
-  };
-
-  this.freeze = function() {
-    // pause animation
-    if (!storm.disabled) {
-      storm.disabled = 1;
-    } else {
-      return false;
-    }
-    storm.timer = null;
-  };
-
-  this.resume = function() {
-    if (storm.disabled) {
-       storm.disabled = 0;
-    } else {
-      return false;
-    }
-    storm.timerInit();
-  };
-
-  this.toggleSnow = function() {
-    if (!storm.flakes.length) {
-      // first run
-      storm.start();
-    } else {
-      storm.active = !storm.active;
-      if (storm.active) {
-        storm.show();
-        storm.resume();
-      } else {
-        storm.stop();
-        storm.freeze();
-      }
-    }
-  };
-
-  this.stop = function() {
-    var i;
-    this.freeze();
-    for (i=0; i<this.flakes.length; i++) {
-      this.flakes[i].o.style.display = 'none';
-    }
-    storm.events.remove(window,'scroll',storm.scrollHandler);
-    storm.events.remove(window,'resize',storm.resizeHandler);
-    if (storm.freezeOnBlur) {
-      if (isIE) {
-        storm.events.remove(document,'focusout',storm.freeze);
-        storm.events.remove(document,'focusin',storm.resume);
-      } else {
-        storm.events.remove(window,'blur',storm.freeze);
-        storm.events.remove(window,'focus',storm.resume);
-      }
-    }
-  };
-
-  this.show = function() {
-    var i;
-    for (i=0; i<this.flakes.length; i++) {
-      this.flakes[i].o.style.display = 'block';
-    }
-  };
-
-  this.SnowFlake = function(type,x,y) {
-    var s = this;
-    this.type = type;
-    this.x = x||parseInt(rnd(screenX-20),10);
-    this.y = (!isNaN(y)?y:-rnd(screenY)-12);
-    this.vX = null;
-    this.vY = null;
-    this.vAmpTypes = [1,1.2,1.4,1.6,1.8]; // "amplification" for vX/vY (based on flake size/type)
-    this.vAmp = this.vAmpTypes[this.type] || 1;
-    this.melting = false;
-    this.meltFrameCount = storm.meltFrameCount;
-    this.meltFrames = storm.meltFrames;
-    this.meltFrame = 0;
-    this.twinkleFrame = 0;
-    this.active = 1;
-    this.fontSize = (10+(this.type/5)*10);
-    this.o = document.createElement('div');
-    this.o.innerHTML = storm.snowCharacter;
-    if (storm.className) {
-      this.o.setAttribute('class', storm.className);
-    }
-    this.o.style.color = storm.snowColor;
-    this.o.style.position = (fixedForEverything?'fixed':'absolute');
-    if (storm.useGPU && features.transform.prop) {
-      // GPU-accelerated snow.
-      this.o.style[features.transform.prop] = 'translate3d(0px, 0px, 0px)';
-    }
-    this.o.style.width = storm.flakeWidth+'px';
-    this.o.style.height = storm.flakeHeight+'px';
-    this.o.style.fontFamily = 'arial,verdana';
-    this.o.style.cursor = 'default';
-    this.o.style.overflow = 'hidden';
-    this.o.style.fontWeight = 'normal';
-    this.o.style.zIndex = storm.zIndex;
-    docFrag.appendChild(this.o);
-
-    this.refresh = function() {
-      if (isNaN(s.x) || isNaN(s.y)) {
-        // safety check
-        return false;
-      }
-      storm.setXY(s.o, s.x, s.y);
-    };
-
-    this.stick = function() {
-      if (noFixed || (storm.targetElement !== document.documentElement && storm.targetElement !== document.body)) {
-        s.o.style.top = (screenY+scrollY-storm.flakeHeight)+'px';
-      } else if (storm.flakeBottom) {
-        s.o.style.top = storm.flakeBottom+'px';
-      } else {
-        s.o.style.display = 'none';
-        s.o.style.bottom = '0%';
-        s.o.style.position = 'fixed';
-        s.o.style.display = 'block';
-      }
-    };
-
-    this.vCheck = function() {
-      if (s.vX>=0 && s.vX<0.2) {
-        s.vX = 0.2;
-      } else if (s.vX<0 && s.vX>-0.2) {
-        s.vX = -0.2;
-      }
-      if (s.vY>=0 && s.vY<0.2) {
-        s.vY = 0.2;
-      }
-    };
-
-    this.move = function() {
-      var vX = s.vX*windOffset, yDiff;
-      s.x += vX;
-      s.y += (s.vY*s.vAmp);
-      if (s.x >= screenX || screenX-s.x < storm.flakeWidth) { // X-axis scroll check
-        s.x = 0;
-      } else if (vX < 0 && s.x-storm.flakeLeftOffset < -storm.flakeWidth) {
-        s.x = screenX-storm.flakeWidth-1; // flakeWidth;
-      }
-      s.refresh();
-      yDiff = screenY+scrollY-s.y+storm.flakeHeight;
-      if (yDiff<storm.flakeHeight) {
-        s.active = 0;
-        if (storm.snowStick) {
-          s.stick();
-        } else {
-          s.recycle();
-        }
-      } else {
-        if (storm.useMeltEffect && s.active && s.type < 3 && !s.melting && Math.random()>0.998) {
-          // ~1/1000 chance of melting mid-air, with each frame
-          s.melting = true;
-          s.melt();
-          // only incrementally melt one frame
-          // s.melting = false;
-        }
-        if (storm.useTwinkleEffect) {
-          if (s.twinkleFrame < 0) {
-            if (Math.random() > 0.97) {
-              s.twinkleFrame = parseInt(Math.random() * 8, 10);
-            }
-          } else {
-            s.twinkleFrame--;
-            if (!opacitySupported) {
-              s.o.style.visibility = (s.twinkleFrame && s.twinkleFrame % 2 === 0 ? 'hidden' : 'visible');
-            } else {
-              s.o.style.opacity = (s.twinkleFrame && s.twinkleFrame % 2 === 0 ? 0 : 1);
-            }
-          }
-        }
-      }
-    };
-
-    this.animate = function() {
-      // main animation loop
-      // move, check status, die etc.
-      s.move();
-    };
-
-    this.setVelocities = function() {
-      s.vX = vRndX+rnd(storm.vMaxX*0.12,0.1);
-      s.vY = vRndY+rnd(storm.vMaxY*0.12,0.1);
-    };
-
-    this.setOpacity = function(o,opacity) {
-      if (!opacitySupported) {
-        return false;
-      }
-      o.style.opacity = opacity;
-    };
-
-    this.melt = function() {
-      if (!storm.useMeltEffect || !s.melting) {
-        s.recycle();
-      } else {
-        if (s.meltFrame < s.meltFrameCount) {
-          s.setOpacity(s.o,s.meltFrames[s.meltFrame]);
-          s.o.style.fontSize = s.fontSize-(s.fontSize*(s.meltFrame/s.meltFrameCount))+'px';
-          s.o.style.lineHeight = storm.flakeHeight+2+(storm.flakeHeight*0.75*(s.meltFrame/s.meltFrameCount))+'px';
-          s.meltFrame++;
-        } else {
-          s.recycle();
-        }
-      }
-    };
-
-    this.recycle = function() {
-      s.o.style.display = 'none';
-      s.o.style.position = (fixedForEverything?'fixed':'absolute');
-      s.o.style.bottom = 'auto';
-      s.setVelocities();
-      s.vCheck();
-      s.meltFrame = 0;
-      s.melting = false;
-      s.setOpacity(s.o,1);
-      s.o.style.padding = '0px';
-      s.o.style.margin = '0px';
-      s.o.style.fontSize = s.fontSize+'px';
-      s.o.style.lineHeight = (storm.flakeHeight+2)+'px';
-      s.o.style.textAlign = 'center';
-      s.o.style.verticalAlign = 'baseline';
-      s.x = parseInt(rnd(screenX-storm.flakeWidth-20),10);
-      s.y = parseInt(rnd(screenY)*-1,10)-storm.flakeHeight;
-      s.refresh();
-      s.o.style.display = 'block';
-      s.active = 1;
-    };
-
-    this.recycle(); // set up x/y coords etc.
-    this.refresh();
-
-  };
-
-  this.snow = function() {
-    var active = 0, flake = null, i, j;
-    for (i=0, j=storm.flakes.length; i<j; i++) {
-      if (storm.flakes[i].active === 1) {
-        storm.flakes[i].move();
-        active++;
-      }
-      if (storm.flakes[i].melting) {
-        storm.flakes[i].melt();
-      }
-    }
-    if (active<storm.flakesMaxActive) {
-      flake = storm.flakes[parseInt(rnd(storm.flakes.length),10)];
-      if (flake.active === 0) {
-        flake.melting = true;
-      }
-    }
-    if (storm.timer) {
-      features.getAnimationFrame(storm.snow);
-    }
-  };
-
-  this.mouseMove = function(e) {
-    if (!storm.followMouse) {
-      return true;
-    }
-    var x = parseInt(e.clientX,10);
-    if (x<screenX2) {
-      windOffset = -windMultiplier+(x/screenX2*windMultiplier);
-    } else {
-      x -= screenX2;
-      windOffset = (x/screenX2)*windMultiplier;
-    }
-  };
-
-  this.createSnow = function(limit,allowInactive) {
-    var i;
-    for (i=0; i<limit; i++) {
-      storm.flakes[storm.flakes.length] = new storm.SnowFlake(parseInt(rnd(flakeTypes),10));
-      if (allowInactive || i>storm.flakesMaxActive) {
-        storm.flakes[storm.flakes.length-1].active = -1;
-      }
-    }
-    storm.targetElement.appendChild(docFrag);
-  };
-
-  this.timerInit = function() {
-    storm.timer = true;
-    storm.snow();
-  };
-
-  this.init = function() {
-    var i;
-    for (i=0; i<storm.meltFrameCount; i++) {
-      storm.meltFrames.push(1-(i/storm.meltFrameCount));
-    }
-    storm.randomizeWind();
-    storm.createSnow(storm.flakesMax); // create initial batch
-    storm.events.add(window,'resize',storm.resizeHandler);
-    storm.events.add(window,'scroll',storm.scrollHandler);
-    if (storm.freezeOnBlur) {
-      if (isIE) {
-        storm.events.add(document,'focusout',storm.freeze);
-        storm.events.add(document,'focusin',storm.resume);
-      } else {
-        storm.events.add(window,'blur',storm.freeze);
-        storm.events.add(window,'focus',storm.resume);
-      }
-    }
-    storm.resizeHandler();
-    storm.scrollHandler();
-    if (storm.followMouse) {
-      storm.events.add(isIE?document:window,'mousemove',storm.mouseMove);
-    }
-    storm.animationInterval = Math.max(20,storm.animationInterval);
-    storm.timerInit();
-  };
-
-  this.start = function(bFromOnLoad) {
-    if (!didInit) {
-      didInit = true;
-    } else if (bFromOnLoad) {
-      // already loaded and running
-      return true;
-    }
-    if (typeof storm.targetElement === 'string') {
-      var targetID = storm.targetElement;
-      storm.targetElement = document.getElementById(targetID);
-      if (!storm.targetElement) {
-        throw new Error('Snowstorm: Unable to get targetElement "'+targetID+'"');
-      }
-    }
-    if (!storm.targetElement) {
-      storm.targetElement = (document.body || document.documentElement);
-    }
-    if (storm.targetElement !== document.documentElement && storm.targetElement !== document.body) {
-      // re-map handler to get element instead of screen dimensions
-      storm.resizeHandler = storm.resizeHandlerAlt;
-      //and force-enable pixel positioning
-      storm.usePixelPosition = true;
-    }
-    storm.resizeHandler(); // get bounding box elements
-    storm.usePositionFixed = (storm.usePositionFixed && !noFixed && !storm.flakeBottom); // whether or not position:fixed is to be used
-    if (window.getComputedStyle) {
-      // attempt to determine if body or user-specified snow parent element is relatlively-positioned.
-      try {
-        targetElementIsRelative = (window.getComputedStyle(storm.targetElement, null).getPropertyValue('position') === 'relative');
-      } catch(e) {
-        // oh well
-        targetElementIsRelative = false;
-      }
-    }
-    fixedForEverything = storm.usePositionFixed;
-    if (screenX && screenY && !storm.disabled) {
-      storm.init();
-      storm.active = true;
-    }
-  };
-
-  function doDelayedStart() {
-    window.setTimeout(function() {
-      storm.start(true);
-    }, 20);
-    // event cleanup
-    storm.events.remove(isIE?document:window,'mousemove',doDelayedStart);
-  }
-
-  function doStart() {
-    if (!storm.excludeMobile || !isMobile) {
-      doDelayedStart();
-    }
-    // event cleanup
-    storm.events.remove(window, 'load', doStart);
-  }
-
-  // hooks for starting the snow
-  if (storm.autoStart) {
-    storm.events.add(window, 'load', doStart, false);
-  }
-
-  return this;
-
-}(window, document));
-
