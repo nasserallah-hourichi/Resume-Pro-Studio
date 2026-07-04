@@ -20,106 +20,73 @@ const defaultSectionVisibility = {
 const defaultResumeCollections = {
     experience: [
         {
-            position: "Full Stack Developer",
-            company: "Palm.ai",
-            date: "October 2025 – Present",
-            description: "- Redesign and re-architecture of the Palm v2 application using NestJS and React.js. Implementation of a multi-tenant architecture, reducing Azure costs from €4,000 to €300/month (~92%). Set up CI/CD pipelines, environment management with Docker, and automated backups. Integrated automation solutions (n8n) and intelligent processing using LLM APIs to optimize certain workflows. Utilized Azure Blob Storage for file management and designed a scalable, optimized infrastructure."
+            position: "Formateur à temps partiel",
+            company: "DECLITECH INNOVATION S.A.R.L",
+            date: "Mai 2026 – Présent",
+            description: "- Dispenser des formations complètes à des étudiants âgés de 7 à 17 ans dans plusieurs disciplines, notamment le développement de jeux vidéo, l'IoT et la programmation mobile.\n- Mettre en œuvre des stratégies d'apprentissage par projet (PBL), guidant les étudiants du concept initial à la création de produits numériques fonctionnels et de prototypes intelligents.\n- Vulgariser des concepts complexes de l'informatique (logique, algorithmes et intégration matérielle) en modules adaptés à l'âge et aux différents niveaux de compétences.\n- Animer des ateliers pratiques favorisant le développement de l'esprit critique, de la résolution de problèmes et de la créativité technique dans un environnement dynamique."
         },
         {
-            position: "Full Stack Developer",
-            company: "QuickText",
-            date: "October 2024 – October 2025",
-            description: "- Responsible for the maintenance, optimization, and evolution of Velma, an AI-powered hotel assistant deployed in over 1,700 hotels. Led a high-traffic platform with strong requirements for performance, scalability, and reliability. - Continuous improvement of user experience and interface performance, delivering robust, maintainable, and quality-focused features. Closely collaborated with product, AI, and operations teams to solve complex issues and optimize the overall architecture. - Design and integration of LLM-based solutions and orchestration of automated workflows (n8n, APIs), contributing to the optimization of operational workflows and an enhanced customer experience."
+            position: "Ingénieur Logiciel Full Stack",
+            company: "SPORTOPIA S.U.A.R.L",
+            date: "Septembre 2024 – Décembre 2024",
+            description: "- Diagnostiquer et résoudre un bug critique dans l'algorithme de mise en relation des profils utilisateurs développé avec Node.js, Express et TypeScript, rétablissant ainsi la fonctionnalité de matching entre les joueurs.\n- Réaliser un refactoring complet du backend et du frontend pour assurer une récupération fluide des données et une synchronisation en temps réel entre les API TypeScript et les composants UI de Flutter.\n- Exécuter des migrations de bases de données MySQL complexes pour corriger les incohérences relationnelles entre les entités utilisateurs et profils, améliorant considérablement l'intégrité des données et la stabilité globale de l'application.\n- Effectuer le nettoyage du code et l'optimisation des performances des modules Node.js et Flutter, réduisant la logique redondante et améliorant la maintenabilité à long terme.\n- Optimiser les requêtes MySQL et les relations de schéma pour prévenir les futures erreurs de logique de matchmaking, garantissant une couche de communication robuste et performante."
         },
         {
-            position: "Web Development Instructor (Part-Time)",
-            company: "TeachCode",
-            date: "December 2024 – April 2025",
-            description: "- Web Development Mentor, guiding learners on fundamental and advanced modern web concepts. Training in engineering thinking: clean architecture, scalability, testing, and solving real world problems. Practical mentorship with NestJS/Spring Boot (backend) and Angular (frontend). Introduction to modern lightweight frameworks (HonoJS) and serverless architectures. Deployment of applications using Cloudflare Workers. Promoted best practices in API design, project structuring, Git, and CI/CD pipelines."
+            position: "Développeur Java Full-Stack",
+            company: "FUTUREPROOF S.A.R.L",
+            date: "Septembre 2022 – Octobre 2024",
+            description: "- Concevoir et implémenter des jobs Spring Batch pour le traitement et la livraison efficaces de grands ensembles de données de réponses GraphQL, améliorant considérablement les performances et l'évolutivité de l'application.\n- Migrer avec succès des services critiques de Spring Boot 2.7 vers 3.1 et intégrer Spring Security 6, garantissant l'alignement de l'application sur les dernières avancées du framework pour une sécurité et une maintenabilité accruees.\n- Développer un service de notification en temps réel via Firebase et intégrer un job de routine (cron job) pour la compression d'images à la volée, contribuant directement à une expérience utilisateur plus riche et performante.\n- Diriger l'implémentation de l'authentification Apple et de fonctionnalités de recherche avancées, y compris le filtrage basé sur la géolocalisation GPS, au sein de l'application mobile Flutter.\n- Gérer une migration stratégique de REST vers GraphQL tout en résolvant des incohérences transactionnelles et d'interface graphique complexes pour garantir un comportement système et un flux de données robustes.\n- Optimiser les interactions avec la base de données MySQL au sein de la couche de traitement par lots pour gérer des transferts de données à grande échelle sans compromettre la stabilité du système."
         },
         {
-            position: "Full Stack Developer",
-            company: "TekabDev",
-            date: "June 2022 – October 2024",
-            description: "- Designed an edge-optimized code generation platform (Cloudflare) enabling automatic creation of production-ready projects (Spring Boot / Angular) with DTO generation via OpenAPI (API-First approach). - Developed a full-stack platform (GraphQL, UI) with LLM integration (Gemini, Claude, OpenAI) for intelligent code generation and workflow optimization. Implemented automated workflows (n8n, Zapier) for process orchestration, code generation, data processing, and task automation. Implemented CI/CD v2 (Docker, Kubernetes), reducing deployment effort by ~80%. Designed a distributed microservices architecture supporting ~50k concurrent users with low latency. Managed PostgreSQL migrations and deployed a self-service GraphQL platform, reducing infrastructure code by ~35%."
-        },
-        {
-            position: "Frontend Developer (Internship)",
-            company: "Beenomi",
-            date: "April 2022 – June 2022",
-            description: "- Complete redesign of the Beenomi application using Java Spring Boot (backend) and React.js (frontend). Improved and optimized the platform for better performance and scalability. Redesigned the user interface for a more modern and intuitive experience. Implemented development best practices and enhanced code maintainability."
-        },
-        {
-            position: "Full Stack Developer (Internship)",
-            company: "ASM - All Soft Multimedia",
-            date: "February 2022 – June 2022",
-            description: "- Developed an HR management system using Angular and Laravel.  - Collaborative work using Agile/Scrum methodology: participated in sprints and Scrum ceremonies, coordinated with product and design teams, prioritized tasks, tracked progress, and delivered incremental features, while promoting continuous improvement."
-        },
-        {
-            position: "Full Stack Developer (Internship)",
-            company: "ASM - All Soft Multimedia",
-            date: "July 2021 – August 2021",
-            description: "- Developed a fleet management system using Angular and Laravel.  - Created modules for fleet management and analytical reporting. Contributed to a hybrid production system, ensuring performance and reliability."
+            position: "Développeur Full-Stack",
+            company: "ZNET-IT S.A.R.L",
+            date: "Juillet 2021 – Septembre 2022",
+            description: "- Concevoir et implémenter un système complet de gestion de cabinet médical en utilisant Angular, Node.js, TypeScript, MongoDB et Mongoose, fluidifiant la gestion des dossiers patients et la planification des rendez-vous (Plateforme MedCity).\n- Développer un système de révision et de gestion de projets au sein d'une plateforme de Crowdfunding, offrant aux administrateurs un contrôle granulaire sur les approbations et rejets de projets afin de maintenir l'intégrité de la plateforme."
         }
     ],
     education: [
         {
-            degree: "National Engineering Degree in Computer Science",
-            date: "2022 – 2025 | Private Polytechnic Institute of Advanced Sciences of Sfax"
+            degree: "Diplôme National d'Ingénieur en Génie Logiciel",
+            date: "Diplômé le 27/09/2024 | Institut Polytechnique Privé des Sciences Avancées de Sfax (IPSAS)"
         },
         {
-            degree: "Bachelor’s Degree in Computer Science and Multimedia",
-            date: "2019 – 2022 | Higher Institute of Computer Science and Multimedia of Sfax"
+            degree: "Licence en Sciences Informatiques (Informatique et Multimédia)",
+            date: "Diplômé le 16/07/2021 | Institut Supérieur de l'Informatique et du Multimédia de Gabès (ISIM Gabès)"
         }
     ],
     skills: [
+        "Node.js",
+        "TypeScript",
+        "Express",
         "Java",
-        "NestJs",
         "Spring Boot",
-        "Laravel",
+        "Spring Batch",
+        "Spring Security",
+        "Angular",
+        "Flutter",
         "GraphQL",
-        "RabbitMQ",
-        "Apache JMeter",
-        "PostgreSQL",
+        "REST",
         "MySQL",
         "MongoDB",
-        "ElasticSearch",
-        "Docker",
-        "Kubernetes (K8S)",
-        "Azure Cloud",
-        "Cloudflare",
-        "Git",
-        "Prometheus",
-        "Kibana",
-        "Grafana",
-        "Nginx",
-        "Zapier",
-        "N8N",
-        "Serverless",
-        "Redis",
-        "BullMQ",
-        "Angular",
-        "ReactJs",
-        "NextJs",
-        "JUnit",
-        "Jest",
-        "Selenium",
-        "Playwright",
-        "Gemini",
-        "Claude",
-        "(LLM APIs)",
-        "Docker Model Runner",
-        "Recommendation Systems",
-        "M2"
+        "Mongoose",
+        "Firebase",
+        "OpenTelemetry",
+        "Jira Software",
+        "Notion",
+        "Confluence",
+        "Python Scripting",
+        "AI Automation",
+        "AI Prompting",
+        "JetBrains Suite"
     ],
     languages: [
         {
             name: "English",
-            level: "Professional working proficiency (B2)"
+            level: "B2 - British Council"
         },
         {
             name: "French",
-            level: "Professional working proficiency (B2)"
+            level: "B2 - Institut Français"
         }
     ]
 };
@@ -164,25 +131,6 @@ const templates = [
             skillsColumnsSelect: "2"
         }
     },
-    // {
-    //     id: "modern",
-    //     name: "Modern Accent",
-    //     description: "High-contrast header with a polished studio feel.",
-    //     preview: ["Accent header", "Sharper visual rhythm"],
-    //     controls: {
-    //         globalFontSelect: "'Montserrat', sans-serif",
-    //         baseFontSize: "14px",
-    //         sectionTitleColor: "#0b3b66",
-    //         textColor: "#243647",
-    //         nameColor: "#f8fafc",
-    //         headlineColor: "#dbe7f3",
-    //         expTitleColor: "#0b3b66",
-    //         companyColor: "#4f6980",
-    //         dateColor: "#6b7f93",
-    //         sectionTitleSize: "0.9rem",
-    //         skillsColumnsSelect: "3"
-    //     }
-    // },
     {
         id: "compact",
         name: "Compact ATS",
@@ -203,7 +151,6 @@ const templates = [
         }
     }
 ];
-
 
 const themePresets = [
     {
