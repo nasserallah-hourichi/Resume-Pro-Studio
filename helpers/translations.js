@@ -9,7 +9,7 @@ const translations = {
         summaryText: "Software Engineer / Full Stack Developer with 4+ years of experience in building scalable web applications. Specialized in microservices architecture with full mastery of the development lifecycle (frontend, backend, databases). Experienced in integrating LLMs (Gemini, Claude, OpenAI) and automating workflows using n8n (self-hosted) and Zapier. Skilled in web scraping (Playwright), orchestration, APIs, and alerting systems (Telegram bots). Strong background in clean code practices, unit testing, DevOps (Docker, CI/CD), and Agile/Scrum methodologies. Capable of designing and delivering robust, autonomous, data- and AI-driven solutions",
         experienceLabel: "Work Experience",
         educationLabel: "Education",
-        skillsLabel: "Core Competencies",
+        skillsLabel: "Technical Skills",
         languagesLabel: "Languages",
         footerNote: "Copyright (c) 2026 Anis Ghabi. All rights reserved.",
         linkedin: "linkedin.com/in/ghabi-anis"
