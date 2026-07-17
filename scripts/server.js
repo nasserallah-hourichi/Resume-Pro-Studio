@@ -61,7 +61,6 @@ function getSeedResumeData(lang) {
     };
 }
 
-
 function saveWorkspacePreference(workspace) {
     localStorage.setItem(STORAGE_KEYS_WORKSPACE, workspace);
 }
@@ -440,8 +439,7 @@ function deleteSection(sectionType) {
 }
 
 // ============================================================
-//   FIXED: buildResumeHTML now includes delete buttons for each
-//   experience and education item.
+//   buildResumeHTML: each experience and education item has a delete button
 // ============================================================
 function buildResumeHTML(lang, customData) {
     const template = getTemplateById(currentTemplateId);
@@ -460,7 +458,7 @@ function buildResumeHTML(lang, customData) {
         `<div id="summaryText" contenteditable="true" class="summary-copy">${escapeHtml(data.summaryText)}</div>`
     );
 
-    // === EXPERIENCE (with per‑item delete) ===
+    // === EXPERIENCE SECTION — each exp-item has a delete button ===
     const experienceSection = buildSectionMarkup(
         "experience",
         translations[lang].experienceLabel,
@@ -482,7 +480,7 @@ function buildResumeHTML(lang, customData) {
         `<button class="btn-add" id="addExpBtn"><i class="fas fa-plus"></i> Add Experience</button>`
     );
 
-    // === EDUCATION (with per‑item delete) ===
+    // === EDUCATION SECTION — each edu-item has a delete button ===
     const educationSection = buildSectionMarkup(
         "education",
         translations[lang].educationLabel,
@@ -1662,8 +1660,6 @@ async function handleOAuthSignIn(provider) {
 }
 
 function updateCoverLetterSaveStatus(coverLetterId, message, type = "info") {
-    console.log("Updating save status for:", coverLetterId, message, type);
-
     const statusEl = document.getElementById(`save-status-${coverLetterId}`);
     if (statusEl) {
         statusEl.textContent = message;
@@ -1692,8 +1688,6 @@ function updateCoverLetterSaveStatus(coverLetterId, message, type = "info") {
                 }
             }, 3000);
         }
-    } else {
-        console.error("Status element not found for ID:", `save-status-${coverLetterId}`);
     }
 }
 
@@ -1923,12 +1917,6 @@ async function loadCoverLetterLibrary() {
 }
 
 async function saveCurrentCoverLetterToCloud(options = {}) {
-    console.log("saveCurrentCoverLetterToCloud called", {
-        hasClient: !!supabaseClient,
-        hasUser: !!currentUser,
-        hasId: !!currentCoverLetterId
-    });
-
     if (!supabaseClient || !currentUser || !currentCoverLetterId) {
         if (!options.silent) {
             showToast(!currentUser ? "Sign in to save cover letters to cloud." : "Create a cover letter first before saving.", "error");
@@ -2072,9 +2060,7 @@ function syncCurrentCoverLetterInLibrary(coverLetter) {
 }
 
 function switchWorkspace(workspace) {
-    console.log("Switching workspace to:", workspace);
     currentWorkspace = workspace;
-
     saveWorkspacePreference(workspace);
 
     document.querySelectorAll(".workspace-tab").forEach((tab) => {
