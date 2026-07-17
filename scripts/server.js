@@ -404,13 +404,37 @@ function renderSkillsMultiColumn(skillsArray, columns) {
         </div>
     `;
 }
+function deleteSection(sectionType) {
+    currentResumeData = extractResumeData();
 
+    const isCustom = sectionType.startsWith("custom-");
+    if (isCustom) {
+        currentResumeData.customSections = (currentResumeData.customSections || [])
+            .filter((section) => section.id !== sectionType);
+    }
+
+    sectionVisibility[sectionType] = false;
+    saveSectionVisibility();
+
+    const savedOrder = loadSectionOrder();
+    if (savedOrder?.length) {
+        const nextOrder = savedOrder.filter((item) => item !== sectionType);
+        localStorage.setItem(STORAGE_KEYS.sectionOrder, JSON.stringify(nextOrder));
+    }
+
+    renderResume(currentLang, false);
+    renderSectionVisibilityControls();
+    markResumeDirty("Section deleted");
+}
 function buildSectionMarkup(sectionType, title, contentHtml, actionHtml) {
     if (!sectionVisibility[sectionType]) return "";
 
     return `
         <div class="draggable-section" data-section-type="${sectionType}">
             <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
+            <button class="btn-delete-section" data-delete-section="${sectionType}" title="Delete section" type="button">
+                <i class="fas fa-times"></i>
+            </button>
             <div class="section-title" style="color: var(--section-title-color, #0f172a); font-size: var(--section-title-size, 0.9rem);">${title}</div>
             ${contentHtml}
             ${actionHtml || ""}
@@ -434,6 +458,8 @@ function buildResumeHTML(lang, customData) {
         translations[lang].summaryLabel,
         `<div id="summaryText" contenteditable="true" class="summary-copy">${escapeHtml(data.summaryText)}</div>`
     );
+
+    
 
     const experienceSection = buildSectionMarkup(
         "experience",
@@ -484,16 +510,16 @@ function buildResumeHTML(lang, customData) {
         `<button class="btn-add" id="addLangBtn"><i class="fas fa-plus"></i> Add Language</button>`
     );
 
-    const customSectionsMarkup = (data.customSections || []).map((section) => buildSectionMarkup(
-        section.id,
-        `<span class="custom-section-title-editable" contenteditable="true">${escapeHtml(section.title || "Custom Section")}</span>`,
-        `
-            <div class="custom-section" data-custom-section-id="${escapeHtml(section.id)}">
-                <div class="custom-section-content" contenteditable="true">${escapeHtml(section.content || "Add your custom content here.")}</div>
-            </div>
-        `,
-        `<button class="btn-add btn-remove-section" data-remove-custom-section="${section.id}"><i class="fas fa-trash"></i> Remove Section</button>`
-    )).join("");
+const customSectionsMarkup = (data.customSections || []).map((section) => buildSectionMarkup(
+    section.id,
+    `<span class="custom-section-title-editable" contenteditable="true">${escapeHtml(section.title || "Custom Section")}</span>`,
+    `
+        <div class="custom-section" data-custom-section-id="${escapeHtml(section.id)}">
+            <div class="custom-section-content" contenteditable="true">${escapeHtml(section.content || "Add your custom content here.")}</div>
+        </div>
+    `
+)).join("");
+
 
     const profilePhotoHtml = data.showPhoto && data.photoUrl
         ? `
@@ -604,6 +630,12 @@ function attachDynamicButtons() {
         };
     }
 
+    document.querySelectorAll("[data-delete-section]").forEach((button) => {
+    button.onclick = () => {
+        deleteSection(button.getAttribute("data-delete-section"));
+    };
+});
+
     const addEdu = document.getElementById("addEduBtn");
     if (addEdu) {
         addEdu.onclick = () => {
@@ -647,12 +679,6 @@ function attachDynamicButtons() {
             container.appendChild(item);
         };
     }
-
-    document.querySelectorAll("[data-remove-custom-section]").forEach((button) => {
-        button.onclick = () => {
-            removeCustomSection(button.getAttribute("data-remove-custom-section"));
-        };
-    });
 }
 
 function applyTemplateState() {
