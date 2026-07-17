@@ -345,11 +345,12 @@ function extractResumeData() {
         }))
         : fallback.education;
 
-    const skills = skillElements.length
-        ? Array.from(skillElements)
-            .map((element) => element.innerText.replace(/^[\-\u2022]\s*/, "").trim())
-            .filter(Boolean)
-        : fallback.skills;
+const skills = skillElements.length
+    ? Array.from(skillElements)
+        .map((element) => (element.querySelector(".skill-text")?.innerText || element.innerText.replace(/^[\-\u2022]\s*/, ""))
+            .trim())
+        .filter(Boolean)
+    : fallback.skills;
 
     const languages = languageElements.length
         ? Array.from(languageElements).map((element) => ({
@@ -394,11 +395,21 @@ function renderSkillsMultiColumn(skillsArray, columns) {
         columnsData.push(skillList.slice(index * itemsPerColumn, (index + 1) * itemsPerColumn));
     }
 
+    let globalIndex = 0;
     return `
         <div class="skills-multicolumn" id="skillsContainer" style="grid-template-columns: repeat(${columnCount}, 1fr);">
             ${columnsData.map((column) => `
                 <div class="skills-column">
-                    ${column.map((skill) => `<div class="skill-item" contenteditable="true"><span class="skill-bullet">-</span> ${escapeHtml(skill)}</div>`).join("")}
+                    ${column.map((skill) => {
+                        const idx = globalIndex++;
+                        return `<div class="skill-item" data-item-index="${idx}" contenteditable="false">
+                            <span class="skill-bullet">-</span>
+                            <span contenteditable="true" class="skill-text">${escapeHtml(skill)}</span>
+                            <button class="btn-delete-item btn-delete-skill" data-delete-skill="${idx}" title="Delete this skill" type="button">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>`;
+                    }).join("")}
                 </div>
             `).join("")}
         </div>
@@ -426,22 +437,26 @@ function deleteSection(sectionType) {
     renderSectionVisibilityControls();
     markResumeDirty("Section deleted");
 }
-function buildSectionMarkup(sectionType, title, contentHtml, actionHtml) {
-    if (!sectionVisibility[sectionType]) return "";
-
-    return `
-        <div class="draggable-section" data-section-type="${sectionType}">
-            <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
-            <button class="btn-delete-section" data-delete-section="${sectionType}" title="Delete section" type="button">
+const experienceSection = buildSectionMarkup(
+    "experience",
+    translations[lang].experienceLabel,
+    `<div id="experiencesContainer">${data.experience.map((exp, index) => `
+        <div class="exp-item" data-item-index="${index}">
+            <button class="btn-delete-item" data-delete-exp="${index}" title="Delete this experience" type="button">
                 <i class="fas fa-times"></i>
             </button>
-            <div class="section-title" style="color: var(--section-title-color, #0f172a); font-size: var(--section-title-size, 0.9rem);">${title}</div>
-            ${contentHtml}
-            ${actionHtml || ""}
+            <div class="exp-header">
+                <div class="exp-heading-group">
+                    <span class="exp-position" contenteditable="true" style="color: var(--exp-title-color, #0f172a);">${escapeHtml(exp.position)}</span>
+                    <span class="exp-company" contenteditable="true" style="color: var(--company-color, #475569);">${escapeHtml(exp.company)}</span>
+                </div>
+                <div class="exp-date" contenteditable="true" style="color: var(--date-color, #64748b);">${escapeHtml(exp.date)}</div>
+            </div>
+            <div class="exp-desc" contenteditable="true">${escapeHtml(exp.description || "")}</div>
         </div>
-    `;
-}
-
+    `).join("")}</div>`,
+    `<button class="btn-add" id="addExpBtn"><i class="fas fa-plus"></i> Add Experience</button>`
+);
 function buildResumeHTML(lang, customData) {
     const template = getTemplateById(currentTemplateId);
     const data = cloneResumeData(customData || currentResumeData || getSeedResumeData(lang), lang);
@@ -479,18 +494,20 @@ function buildResumeHTML(lang, customData) {
         `<button class="btn-add" id="addExpBtn"><i class="fas fa-plus"></i> Add Experience</button>`
     );
 
-    const educationSection = buildSectionMarkup(
-        "education",
-        translations[lang].educationLabel,
-        `<div id="educationContainer">${data.education.map((edu) => `
-            <div class="edu-item">
-                <div class="edu-degree" contenteditable="true" style="color: var(--exp-title-color, #0f172a);">${escapeHtml(edu.degree)}</div>
-                <div class="edu-date" contenteditable="true" style="color: var(--date-color, #64748b);">${escapeHtml(edu.date)}</div>
-            </div>
-        `).join("")}</div>`,
-        `<button class="btn-add" id="addEduBtn"><i class="fas fa-plus"></i> Add Education</button>`
-    );
-
+const educationSection = buildSectionMarkup(
+    "education",
+    translations[lang].educationLabel,
+    `<div id="educationContainer">${data.education.map((edu, index) => `
+        <div class="edu-item" data-item-index="${index}">
+            <button class="btn-delete-item" data-delete-edu="${index}" title="Delete this education" type="button">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="edu-degree" contenteditable="true" style="color: var(--exp-title-color, #0f172a);">${escapeHtml(edu.degree)}</div>
+            <div class="edu-date" contenteditable="true" style="color: var(--date-color, #64748b);">${escapeHtml(edu.date)}</div>
+        </div>
+    `).join("")}</div>`,
+    `<button class="btn-add" id="addEduBtn"><i class="fas fa-plus"></i> Add Education</button>`
+);
     const skillsSection = buildSectionMarkup(
         "skills",
         translations[lang].skillsLabel,
@@ -498,17 +515,20 @@ function buildResumeHTML(lang, customData) {
         `<button class="btn-add" id="addSkillBtn"><i class="fas fa-plus"></i> Add Skill</button>`
     );
 
-    const languagesSection = buildSectionMarkup(
-        "languages",
-        translations[lang].languagesLabel,
-        `<div id="languagesContainer">${data.languages.map((language) => `
-            <div class="language-item">
-                <span class="language-name" contenteditable="true">${escapeHtml(language.name)}</span>
-                <span class="language-level" contenteditable="true" style="color: var(--date-color, #64748b);">${escapeHtml(language.level)}</span>
-            </div>
-        `).join("")}</div>`,
-        `<button class="btn-add" id="addLangBtn"><i class="fas fa-plus"></i> Add Language</button>`
-    );
+const languagesSection = buildSectionMarkup(
+    "languages",
+    translations[lang].languagesLabel,
+    `<div id="languagesContainer">${data.languages.map((language, index) => `
+        <div class="language-item" data-item-index="${index}">
+            <span class="language-name" contenteditable="true">${escapeHtml(language.name)}</span>
+            <span class="language-level" contenteditable="true" style="color: var(--date-color, #64748b);">${escapeHtml(language.level)}</span>
+            <button class="btn-delete-item" data-delete-lang="${index}" title="Delete this language" type="button">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `).join("")}</div>`,
+    `<button class="btn-add" id="addLangBtn"><i class="fas fa-plus"></i> Add Language</button>`
+);
 
 const customSectionsMarkup = (data.customSections || []).map((section) => buildSectionMarkup(
     section.id,
@@ -630,10 +650,27 @@ function attachDynamicButtons() {
         };
     }
 
+
     document.querySelectorAll("[data-delete-section]").forEach((button) => {
     button.onclick = () => {
         deleteSection(button.getAttribute("data-delete-section"));
     };
+    
+});
+document.querySelectorAll("[data-delete-exp]").forEach((button) => {
+    button.onclick = () => deleteResumeItem("experience", parseInt(button.getAttribute("data-delete-exp"), 10));
+});
+
+document.querySelectorAll("[data-delete-edu]").forEach((button) => {
+    button.onclick = () => deleteResumeItem("education", parseInt(button.getAttribute("data-delete-edu"), 10));
+});
+
+document.querySelectorAll("[data-delete-skill]").forEach((button) => {
+    button.onclick = () => deleteResumeItem("skills", parseInt(button.getAttribute("data-delete-skill"), 10));
+});
+
+document.querySelectorAll("[data-delete-lang]").forEach((button) => {
+    button.onclick = () => deleteResumeItem("languages", parseInt(button.getAttribute("data-delete-lang"), 10));
 });
 
     const addEdu = document.getElementById("addEduBtn");
@@ -681,6 +718,17 @@ function attachDynamicButtons() {
     }
 }
 
+function deleteResumeItem(collectionKey, index) {
+    currentResumeData = extractResumeData();
+
+    if (!Array.isArray(currentResumeData[collectionKey]) || Number.isNaN(index)) return;
+    if (currentResumeData[collectionKey].length <= 0) return;
+
+    currentResumeData[collectionKey] = currentResumeData[collectionKey].filter((_, i) => i !== index);
+
+    renderResume(currentLang, false);
+    markResumeDirty(`${collectionKey} item removed`);
+}
 function applyTemplateState() {
     const resumeCard = document.getElementById("resumeCard");
     const resumeContainer = document.getElementById("resumeContainer");

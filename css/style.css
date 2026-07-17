@@ -1975,3 +1975,51 @@ footer {
     background: #fee2e2;
     color: #dc2626;
 }
+
+.exp-item, .edu-item, .language-item, .skill-item {
+    position: relative;
+}
+
+.btn-delete-item {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: #cbd5e1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    opacity: 0;
+    transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.exp-item:hover .btn-delete-item,
+.edu-item:hover .btn-delete-item,
+.language-item:hover .btn-delete-item,
+.skill-item:hover .btn-delete-item {
+    opacity: 1;
+}
+
+.btn-delete-item:hover {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.skill-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding-right: 20px;
+}
+
+.btn-delete-skill {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
