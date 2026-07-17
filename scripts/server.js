@@ -437,26 +437,14 @@ function deleteSection(sectionType) {
     renderSectionVisibilityControls();
     markResumeDirty("Section deleted");
 }
-const experienceSection = buildSectionMarkup(
-    "experience",
-    translations[lang].experienceLabel,
-    `<div id="experiencesContainer">${data.experience.map((exp, index) => `
-        <div class="exp-item" data-item-index="${index}">
-            <button class="btn-delete-item" data-delete-exp="${index}" title="Delete this experience" type="button">
-                <i class="fas fa-times"></i>
-            </button>
-            <div class="exp-header">
-                <div class="exp-heading-group">
-                    <span class="exp-position" contenteditable="true" style="color: var(--exp-title-color, #0f172a);">${escapeHtml(exp.position)}</span>
-                    <span class="exp-company" contenteditable="true" style="color: var(--company-color, #475569);">${escapeHtml(exp.company)}</span>
-                </div>
-                <div class="exp-date" contenteditable="true" style="color: var(--date-color, #64748b);">${escapeHtml(exp.date)}</div>
-            </div>
-            <div class="exp-desc" contenteditable="true">${escapeHtml(exp.description || "")}</div>
-        </div>
-    `).join("")}</div>`,
-    `<button class="btn-add" id="addExpBtn"><i class="fas fa-plus"></i> Add Experience</button>`
-);
+
+// ============================================================
+//   FIX: Removed erroneous top-level definitions of
+//   experienceSection, educationSection, skillsSection, etc.
+//   that referenced 'lang' outside any function.
+//   The correct definitions are inside buildResumeHTML below.
+// ============================================================
+
 function buildResumeHTML(lang, customData) {
     const template = getTemplateById(currentTemplateId);
     const data = cloneResumeData(customData || currentResumeData || getSeedResumeData(lang), lang);
