@@ -314,7 +314,6 @@ function normalizeResumeRecord(record) {
     };
 }
 
-/* MODIFIED: Safely extracts zero-item / empty states and strips empty rows out of the file payload */
 function extractResumeData() {
     const fallback = cloneResumeData(currentResumeData || getSeedResumeData(currentLang), currentLang);
     if (!document.getElementById("resumeContainer")) return fallback;
@@ -330,33 +329,50 @@ function extractResumeData() {
     const languageElements = document.querySelectorAll("#languagesContainer .language-item");
     const customSectionElements = document.querySelectorAll(".custom-section");
 
-    // Extract lists and filter out rows where all inputs are completely blank
-    const experience = Array.from(experienceElements).map((element) => ({
-        position: element.querySelector(".exp-position")?.innerText.trim() || "",
-        company: element.querySelector(".exp-company")?.innerText.replace(/^, \s*/, "").trim() || "",
-        date: element.querySelector(".exp-date")?.innerText.trim() || "",
-        description: element.querySelector(".exp-desc")?.innerText.trim() || ""
-    })).filter((exp) => exp.position || exp.company || exp.date || exp.description);
+    const experience = experienceElements.length
+        ? Array.from(experienceElements).map((element) => ({
+            position: element.querySelector(".exp-position")?.innerText.trim() || "",
+            company: element.querySelector(".exp-company")?.innerText.replace(/^, \s*/, "").trim() || "",
+            date: element.querySelector(".exp-date")?.innerText.trim() || "",
+            description: element.querySelector(".exp-desc")?.innerText.trim() || ""
+        }))
+        : fallback.experience;
 
-    const education = Array.from(educationElements).map((element) => ({
-        degree: element.querySelector(".edu-degree")?.innerText.trim() || "",
-        date: element.querySelector(".edu-date")?.innerText.trim() || ""
-    })).filter((edu) => edu.degree || edu.date);
+    const education = educationElements.length
+        ? Array.from(educationElements).map((element) => ({
+            degree: element.querySelector(".edu-degree")?.innerText.trim() || "",
+            date: element.querySelector(".edu-date")?.innerText.trim() || ""
+        }))
+        : fallback.education;
 
-    const skills = Array.from(skillElements)
-        .map((element) => element.innerText.replace(/^[\-\u2022]\s*/, "").trim())
-        .filter(Boolean);
+    const skills = skillElements.length
+        ? Array.from(skillElements)
+            .map((element) => element.innerText.replace(/^[\-\u2022]\s*/, "").trim())
+            .filter(Boolean)
+        : fallback.skills;
 
-    const languages = Array.from(languageElements).map((element) => ({
-        name: element.querySelector(".language-name")?.innerText.trim() || "",
-        level: element.querySelector(".language-level")?.innerText.trim() || ""
-    })).filter((lang) => lang.name || lang.level);
+    const languages = languageElements.length
+        ? Array.from(languageElements).map((element) => ({
+            name: element.querySelector(".language-name")?.innerText.trim() || "",
+            level: element.querySelector(".language-level")?.innerText.trim() || ""
+        }))
+        : fallback.languages;
 
-    const customSections = Array.from(customSectionElements).map((element) => ({
-        id: element.getAttribute("data-custom-section-id") || "",
-        title: element.closest(".draggable-section")?.querySelector(".custom-section-title-editable")?.innerText.trim() || "Custom Section",
-        content: element.querySelector(".custom-section-content")?.innerText.trim() || ""
-    })).filter((sec) => sec.content.trim() !== "");
+    const customSections = customSectionElements.length
+        ? Array.from(customSectionElements).map((element) => ({
+            id: element.getAttribute("data-custom-section-id") || "",
+            title: element.querySelector(".custom-section-title-editable")?.innerText.trim() || "Custom Section",
+            content: element.querySelector(".custom-section-content")?.innerText.trim() || ""
+        }))
+        : fallback.customSections;
+
+    // ADDED FUNCTIONALITY: Filter arrays down to actual data and prevent unintended fallbacks if visually cleared out
+    const cleanExperience = (document.getElementById("experiencesContainer") && experienceElements.length === 0) ? [] : experience.filter(exp => exp.position || exp.company || exp.date || exp.description);
+    const cleanEducation = (document.getElementById("educationContainer") && educationElements.length === 0) ? [] : education.filter(edu => edu.degree || edu.date);
+    const cleanSkills = (document.getElementById("skillsContainer") && skillElements.length === 0) ? [] : skills.filter(Boolean);
+    const cleanLanguages = (document.getElementById("languagesContainer") && languageElements.length === 0) ? [] : languages.filter(lang => lang.name || lang.level);
+    const cleanCustomSections = customSections.filter(sec => sec.content.trim() !== "");
+    const cleanSummaryText = getText("summaryText", fallback.summaryText) === "" ? "" : getText("summaryText", fallback.summaryText);
 
     return {
         fullName: getText("fullNameEditable", fallback.fullName),
@@ -365,20 +381,22 @@ function extractResumeData() {
         email: getText("contactEmail", fallback.email),
         address: getText("contactAddress", fallback.address),
         linkedin: getText("contactLinkedin", fallback.linkedin),
-        summaryText: getText("summaryText", ""), // Default to blank string if deleted
-        experience,
-        education,
-        skills,
-        languages,
-        customSections,
+        summaryText: cleanSummaryText,
+        experience: cleanExperience,
+        education: cleanEducation,
+        skills: cleanSkills,
+        languages: cleanLanguages,
+        customSections: cleanCustomSections,
         photoUrl: fallback.photoUrl,
         showPhoto: fallback.showPhoto
     };
 }
 
 function renderSkillsMultiColumn(skillsArray, columns) {
-    const skillList = skillsArray && skillsArray.length ? skillsArray : [];
-    if (skillList.length === 0) return "";
+    const skillList = skillsArray && skillsArray.length ? skillsArray : defaultResumeCollections.skills;
+    
+    // ADDED FUNCTIONALITY: Immediately return empty markup if skills are verified empty
+    if (!skillsArray || skillsArray.length === 0) return "";
     
     const columnCount = parseInt(columns, 10) || 3;
     const itemsPerColumn = Math.ceil(skillList.length / columnCount);
@@ -399,7 +417,7 @@ function renderSkillsMultiColumn(skillsArray, columns) {
     `;
 }
 
-/* MODIFIED: Added `isEmpty` check. Returns empty string entirely to let the layout collapse and shift up naturally */
+// ADDED FUNCTIONALITY: Added optional default parameter `isEmpty` to check structural emptiness
 function buildSectionMarkup(sectionType, title, contentHtml, actionHtml, isEmpty = false) {
     if (!sectionVisibility[sectionType] || isEmpty) return "";
 
@@ -413,20 +431,18 @@ function buildSectionMarkup(sectionType, title, contentHtml, actionHtml, isEmpty
     `;
 }
 
-/* MODIFIED: Passes conditional empty checks to `buildSectionMarkup` */
 function buildResumeHTML(lang, customData) {
     const template = getTemplateById(currentTemplateId);
     const data = cloneResumeData(customData || currentResumeData || getSeedResumeData(lang), lang);
-    
     (data.customSections || []).forEach((section) => {
         if (typeof sectionVisibility[section.id] === "undefined") {
             sectionVisibility[section.id] = true;
         }
     });
-    
     const skillsColumns = document.getElementById("skillsColumnsSelect")?.value || template.controls.skillsColumnsSelect || "3";
     const skillsHtml = renderSkillsMultiColumn(data.skills, skillsColumns);
 
+    // ADDED FUNCTIONALITY: Appended emptiness visibility arguments as the 5th parameter to each call
     const summarySection = buildSectionMarkup(
         "summary",
         translations[lang].summaryLabel,
@@ -472,7 +488,7 @@ function buildResumeHTML(lang, customData) {
         translations[lang].skillsLabel,
         skillsHtml,
         `<button class="btn-add" id="addSkillBtn"><i class="fas fa-plus"></i> Add Skill</button>`,
-        (!data.skills || data.skills.length === 0)
+        (!data.skills || data.skills.length === 0 || skillsHtml.trim() === "")
     );
 
     const languagesSection = buildSectionMarkup(
@@ -493,7 +509,7 @@ function buildResumeHTML(lang, customData) {
         `<span class="custom-section-title-editable" contenteditable="true">${escapeHtml(section.title || "Custom Section")}</span>`,
         `
             <div class="custom-section" data-custom-section-id="${escapeHtml(section.id)}">
-                <div class="custom-section-content" contenteditable="true">${escapeHtml(section.content || "")}</div>
+                <div class="custom-section-content" contenteditable="true">${escapeHtml(section.content || "Add your custom content here.")}</div>
             </div>
         `,
         `<button class="btn-add btn-remove-section" data-remove-custom-section="${section.id}"><i class="fas fa-trash"></i> Remove Section</button>`,
