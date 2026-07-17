@@ -68,7 +68,7 @@ function saveWorkspacePreference(workspace) {
 
 function loadWorkspacePreference() {
     const saved = localStorage.getItem(STORAGE_KEYS_WORKSPACE);
-    return saved === "coverLetter" ? "coverLetter" : "resume"; // Default to resume
+    return saved === "coverLetter" ? "coverLetter" : "resume";
 }
 
 function cloneResumeData(data, lang = currentLang) {
@@ -345,12 +345,12 @@ function extractResumeData() {
         }))
         : fallback.education;
 
-const skills = skillElements.length
-    ? Array.from(skillElements)
-        .map((element) => (element.querySelector(".skill-text")?.innerText || element.innerText.replace(/^[\-\u2022]\s*/, ""))
-            .trim())
-        .filter(Boolean)
-    : fallback.skills;
+    const skills = skillElements.length
+        ? Array.from(skillElements)
+            .map((element) => (element.querySelector(".skill-text")?.innerText || element.innerText.replace(/^[\-\u2022]\s*/, ""))
+                .trim())
+            .filter(Boolean)
+        : fallback.skills;
 
     const languages = languageElements.length
         ? Array.from(languageElements).map((element) => ({
@@ -415,6 +415,7 @@ function renderSkillsMultiColumn(skillsArray, columns) {
         </div>
     `;
 }
+
 function deleteSection(sectionType) {
     currentResumeData = extractResumeData();
 
@@ -439,12 +440,9 @@ function deleteSection(sectionType) {
 }
 
 // ============================================================
-//   FIX: Removed erroneous top-level definitions of
-//   experienceSection, educationSection, skillsSection, etc.
-//   that referenced 'lang' outside any function.
-//   The correct definitions are inside buildResumeHTML below.
+//   FIXED: buildResumeHTML now includes delete buttons for each
+//   experience and education item.
 // ============================================================
-
 function buildResumeHTML(lang, customData) {
     const template = getTemplateById(currentTemplateId);
     const data = cloneResumeData(customData || currentResumeData || getSeedResumeData(lang), lang);
@@ -462,13 +460,15 @@ function buildResumeHTML(lang, customData) {
         `<div id="summaryText" contenteditable="true" class="summary-copy">${escapeHtml(data.summaryText)}</div>`
     );
 
-    
-
+    // === EXPERIENCE (with per‑item delete) ===
     const experienceSection = buildSectionMarkup(
         "experience",
         translations[lang].experienceLabel,
-        `<div id="experiencesContainer">${data.experience.map((exp) => `
-            <div class="exp-item">
+        `<div id="experiencesContainer">${data.experience.map((exp, index) => `
+            <div class="exp-item" data-item-index="${index}">
+                <button class="btn-delete-item" data-delete-exp="${index}" title="Delete this experience" type="button">
+                    <i class="fas fa-times"></i>
+                </button>
                 <div class="exp-header">
                     <div class="exp-heading-group">
                         <span class="exp-position" contenteditable="true" style="color: var(--exp-title-color, #0f172a);">${escapeHtml(exp.position)}</span>
@@ -482,20 +482,22 @@ function buildResumeHTML(lang, customData) {
         `<button class="btn-add" id="addExpBtn"><i class="fas fa-plus"></i> Add Experience</button>`
     );
 
-const educationSection = buildSectionMarkup(
-    "education",
-    translations[lang].educationLabel,
-    `<div id="educationContainer">${data.education.map((edu, index) => `
-        <div class="edu-item" data-item-index="${index}">
-            <button class="btn-delete-item" data-delete-edu="${index}" title="Delete this education" type="button">
-                <i class="fas fa-times"></i>
-            </button>
-            <div class="edu-degree" contenteditable="true" style="color: var(--exp-title-color, #0f172a);">${escapeHtml(edu.degree)}</div>
-            <div class="edu-date" contenteditable="true" style="color: var(--date-color, #64748b);">${escapeHtml(edu.date)}</div>
-        </div>
-    `).join("")}</div>`,
-    `<button class="btn-add" id="addEduBtn"><i class="fas fa-plus"></i> Add Education</button>`
-);
+    // === EDUCATION (with per‑item delete) ===
+    const educationSection = buildSectionMarkup(
+        "education",
+        translations[lang].educationLabel,
+        `<div id="educationContainer">${data.education.map((edu, index) => `
+            <div class="edu-item" data-item-index="${index}">
+                <button class="btn-delete-item" data-delete-edu="${index}" title="Delete this education" type="button">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="edu-degree" contenteditable="true" style="color: var(--exp-title-color, #0f172a);">${escapeHtml(edu.degree)}</div>
+                <div class="edu-date" contenteditable="true" style="color: var(--date-color, #64748b);">${escapeHtml(edu.date)}</div>
+            </div>
+        `).join("")}</div>`,
+        `<button class="btn-add" id="addEduBtn"><i class="fas fa-plus"></i> Add Education</button>`
+    );
+
     const skillsSection = buildSectionMarkup(
         "skills",
         translations[lang].skillsLabel,
@@ -503,31 +505,30 @@ const educationSection = buildSectionMarkup(
         `<button class="btn-add" id="addSkillBtn"><i class="fas fa-plus"></i> Add Skill</button>`
     );
 
-const languagesSection = buildSectionMarkup(
-    "languages",
-    translations[lang].languagesLabel,
-    `<div id="languagesContainer">${data.languages.map((language, index) => `
-        <div class="language-item" data-item-index="${index}">
-            <span class="language-name" contenteditable="true">${escapeHtml(language.name)}</span>
-            <span class="language-level" contenteditable="true" style="color: var(--date-color, #64748b);">${escapeHtml(language.level)}</span>
-            <button class="btn-delete-item" data-delete-lang="${index}" title="Delete this language" type="button">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-    `).join("")}</div>`,
-    `<button class="btn-add" id="addLangBtn"><i class="fas fa-plus"></i> Add Language</button>`
-);
+    const languagesSection = buildSectionMarkup(
+        "languages",
+        translations[lang].languagesLabel,
+        `<div id="languagesContainer">${data.languages.map((language, index) => `
+            <div class="language-item" data-item-index="${index}">
+                <span class="language-name" contenteditable="true">${escapeHtml(language.name)}</span>
+                <span class="language-level" contenteditable="true" style="color: var(--date-color, #64748b);">${escapeHtml(language.level)}</span>
+                <button class="btn-delete-item" data-delete-lang="${index}" title="Delete this language" type="button">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `).join("")}</div>`,
+        `<button class="btn-add" id="addLangBtn"><i class="fas fa-plus"></i> Add Language</button>`
+    );
 
-const customSectionsMarkup = (data.customSections || []).map((section) => buildSectionMarkup(
-    section.id,
-    `<span class="custom-section-title-editable" contenteditable="true">${escapeHtml(section.title || "Custom Section")}</span>`,
-    `
-        <div class="custom-section" data-custom-section-id="${escapeHtml(section.id)}">
-            <div class="custom-section-content" contenteditable="true">${escapeHtml(section.content || "Add your custom content here.")}</div>
-        </div>
-    `
-)).join("");
-
+    const customSectionsMarkup = (data.customSections || []).map((section) => buildSectionMarkup(
+        section.id,
+        `<span class="custom-section-title-editable" contenteditable="true">${escapeHtml(section.title || "Custom Section")}</span>`,
+        `
+            <div class="custom-section" data-custom-section-id="${escapeHtml(section.id)}">
+                <div class="custom-section-content" contenteditable="true">${escapeHtml(section.content || "Add your custom content here.")}</div>
+            </div>
+        `
+    )).join("");
 
     const profilePhotoHtml = data.showPhoto && data.photoUrl
         ? `
@@ -582,6 +583,7 @@ function buildSectionMarkup(sectionType, title, contentHtml, actionHtml) {
         </div>
     `;
 }
+
 function initSortable() {
     const container = document.getElementById("sectionsContainer");
     if (!container) return;
@@ -633,6 +635,7 @@ function applySectionOrder() {
 }
 
 function attachDynamicButtons() {
+    // Add Experience
     const addExp = document.getElementById("addExpBtn");
     if (addExp) {
         addExp.onclick = () => {
@@ -653,29 +656,34 @@ function attachDynamicButtons() {
         };
     }
 
-
+    // Delete section
     document.querySelectorAll("[data-delete-section]").forEach((button) => {
-    button.onclick = () => {
-        deleteSection(button.getAttribute("data-delete-section"));
-    };
-    
-});
-document.querySelectorAll("[data-delete-exp]").forEach((button) => {
-    button.onclick = () => deleteResumeItem("experience", parseInt(button.getAttribute("data-delete-exp"), 10));
-});
+        button.onclick = () => {
+            deleteSection(button.getAttribute("data-delete-section"));
+        };
+    });
 
-document.querySelectorAll("[data-delete-edu]").forEach((button) => {
-    button.onclick = () => deleteResumeItem("education", parseInt(button.getAttribute("data-delete-edu"), 10));
-});
+    // Delete experience
+    document.querySelectorAll("[data-delete-exp]").forEach((button) => {
+        button.onclick = () => deleteResumeItem("experience", parseInt(button.getAttribute("data-delete-exp"), 10));
+    });
 
-document.querySelectorAll("[data-delete-skill]").forEach((button) => {
-    button.onclick = () => deleteResumeItem("skills", parseInt(button.getAttribute("data-delete-skill"), 10));
-});
+    // Delete education
+    document.querySelectorAll("[data-delete-edu]").forEach((button) => {
+        button.onclick = () => deleteResumeItem("education", parseInt(button.getAttribute("data-delete-edu"), 10));
+    });
 
-document.querySelectorAll("[data-delete-lang]").forEach((button) => {
-    button.onclick = () => deleteResumeItem("languages", parseInt(button.getAttribute("data-delete-lang"), 10));
-});
+    // Delete skill
+    document.querySelectorAll("[data-delete-skill]").forEach((button) => {
+        button.onclick = () => deleteResumeItem("skills", parseInt(button.getAttribute("data-delete-skill"), 10));
+    });
 
+    // Delete language
+    document.querySelectorAll("[data-delete-lang]").forEach((button) => {
+        button.onclick = () => deleteResumeItem("languages", parseInt(button.getAttribute("data-delete-lang"), 10));
+    });
+
+    // Add Education
     const addEdu = document.getElementById("addEduBtn");
     if (addEdu) {
         addEdu.onclick = () => {
@@ -690,6 +698,7 @@ document.querySelectorAll("[data-delete-lang]").forEach((button) => {
         };
     }
 
+    // Add Skill
     const addSkill = document.getElementById("addSkillBtn");
     if (addSkill) {
         addSkill.onclick = () => {
@@ -706,6 +715,7 @@ document.querySelectorAll("[data-delete-lang]").forEach((button) => {
         };
     }
 
+    // Add Language
     const addLang = document.getElementById("addLangBtn");
     if (addLang) {
         addLang.onclick = () => {
@@ -732,6 +742,7 @@ function deleteResumeItem(collectionKey, index) {
     renderResume(currentLang, false);
     markResumeDirty(`${collectionKey} item removed`);
 }
+
 function applyTemplateState() {
     const resumeCard = document.getElementById("resumeCard");
     const resumeContainer = document.getElementById("resumeContainer");
@@ -1293,14 +1304,13 @@ async function generateCleanPDF() {
         // Base styles
         clone.style.cssText = "margin:0;padding:0;box-shadow:none;border-radius:0;width:750px;";
 
-        // ✅ Fix all flex elements with exact class targeting
+        // Flex fixes
         const flexFixes = {
             "resume-header-inner": { parent: "block", children: "block" },
             "contact-info": { parent: "block", children: "inline" },
             "sections-container": { parent: "block", children: "block" },
             "section-title": { parent: "block", children: "inline-block" },
             "language-item": { parent: "block overflow-hidden", children: "float" },
-            // ❌ exp-header, exp-heading-group, edu-item removed — handled explicitly
         };
 
         clone.querySelectorAll(".exp-header").forEach(header => {
@@ -1312,7 +1322,6 @@ async function generateCleanPDF() {
             if (group) group.style.cssText = "display:table-cell;width:65%;vertical-align:middle;white-space:normal;";
             if (date) date.style.cssText = "display:table-cell;width:35%;text-align:right;vertical-align:middle;white-space:nowrap;color:rgb(107,114,128);font-size:11px;";
         });
-
 
         clone.querySelectorAll(".exp-heading-group").forEach(group => {
             group.style.cssText = "display:block;";
@@ -1352,7 +1361,6 @@ async function generateCleanPDF() {
             el.innerHTML = el.innerHTML.replace(/^@\s*@\s*/, "").replace(/^\s*@\s*/, "");
             el.innerText = el.innerText.replace(/^@\s*@\s*/, "").replace(/^\s*@\s*/, "");
         });
-
 
         clone.querySelectorAll(".edu-item").forEach(el => {
             el.style.cssText = "display:block;overflow:hidden;width:100%;margin-bottom:6px;";
@@ -1654,24 +1662,18 @@ async function handleOAuthSignIn(provider) {
 }
 
 function updateCoverLetterSaveStatus(coverLetterId, message, type = "info") {
-    console.log("Updating save status for:", coverLetterId, message, type); // Debug log
+    console.log("Updating save status for:", coverLetterId, message, type);
 
     const statusEl = document.getElementById(`save-status-${coverLetterId}`);
     if (statusEl) {
-        console.log("Found status element:", statusEl); // Debug log
-
         statusEl.textContent = message;
         statusEl.style.display = "inline-flex";
-
-        // Remove previous type classes
         statusEl.classList.remove("saving", "saved", "error", "info");
 
-        // Add type class for styling
         if (type === "saving") {
             statusEl.classList.add("saving");
         } else if (type === "saved") {
             statusEl.classList.add("saved");
-            // Clear saved message after 2 seconds
             setTimeout(() => {
                 if (statusEl.textContent === message) {
                     statusEl.style.display = "none";
@@ -1679,13 +1681,11 @@ function updateCoverLetterSaveStatus(coverLetterId, message, type = "info") {
             }, 2000);
         } else if (type === "error") {
             statusEl.classList.add("error");
-            // Keep error visible longer
             setTimeout(() => {
                 statusEl.style.display = "none";
             }, 4000);
         } else if (type === "info") {
             statusEl.classList.add("info");
-            // Clear info messages after 3 seconds
             setTimeout(() => {
                 if (statusEl.textContent === message) {
                     statusEl.style.display = "none";
@@ -1758,16 +1758,13 @@ function bindSidebarEvents() {
     });
 }
 
-
 async function deleteCoverLetter(coverLetterId) {
     if (!coverLetterId) return;
 
-    // Find the cover letter to delete
     const target = coverLetterLibrary.find(cl => cl.id === coverLetterId);
     const confirmed = window.confirm(`Delete "${target?.title || 'this cover letter'}"? This action cannot be undone.`);
     if (!confirmed) return;
 
-    // If user is logged in, delete from Supabase
     if (supabaseClient && currentUser) {
         const { error } = await supabaseClient
             .from(COVER_LETTERS_TABLE)
@@ -1779,20 +1776,16 @@ async function deleteCoverLetter(coverLetterId) {
             return;
         }
     } else {
-        // Offline mode: delete from localStorage
         delete coverLetters[coverLetterId];
         saveCoverLetterToStorage();
     }
 
-    // Remove from library array
     coverLetterLibrary = coverLetterLibrary.filter(cl => cl.id !== coverLetterId);
 
-    // If we're deleting the currently open cover letter, clear it
     if (coverLetterId === currentCoverLetterId) {
         currentCoverLetterId = null;
         currentCoverLetterData = null;
 
-        // Clear the UI
         const titleInput = document.getElementById("coverLetterTitleInput");
         const jobDescInput = document.getElementById("jobDescriptionInput");
         const container = document.getElementById("coverLetterContainer");
@@ -1904,7 +1897,6 @@ function bindAuthUI() {
     dom.signOutBtn?.addEventListener("click", handleSignOut);
 }
 
-// Cover Letter Supabase Functions
 async function loadCoverLetterLibrary() {
     if (!supabaseClient || !currentUser) return;
 
@@ -1947,8 +1939,6 @@ async function saveCurrentCoverLetterToCloud(options = {}) {
     if (coverLetterIsSaving && !options.force) return;
     coverLetterIsSaving = true;
 
-    // Show saving indicator on the specific cover letter card
-    console.log("Showing saving status for:", currentCoverLetterId);
     updateCoverLetterSaveStatus(currentCoverLetterId, "Saving...", "saving");
 
     try {
@@ -1958,8 +1948,6 @@ async function saveCurrentCoverLetterToCloud(options = {}) {
             content: document.getElementById("coverLetterContainer")?.innerText || document.getElementById("coverLetterContainer")?.textContent || "",
             updated_at: new Date().toISOString()
         };
-
-        console.log("Saving payload:", payload);
 
         const { data, error } = await supabaseClient
             .from(COVER_LETTERS_TABLE)
@@ -1982,7 +1970,6 @@ async function saveCurrentCoverLetterToCloud(options = {}) {
         syncCurrentCoverLetterInLibrary(currentCoverLetterData);
         coverLetterIsDirty = false;
 
-        // Show saved successfully on the card
         if (options.silent) {
             updateCoverLetterSaveStatus(currentCoverLetterId, "Saved", "saved");
         } else {
@@ -2003,15 +1990,12 @@ async function saveCurrentCoverLetterToCloud(options = {}) {
 function scheduleCoverLetterAutosave() {
     if (!currentUser || !currentCoverLetterId) return;
 
-    // Clear existing timer
     if (coverLetterAutosaveTimer) {
         window.clearTimeout(coverLetterAutosaveTimer);
     }
 
-    // Show pending auto-save indicator on the card
     updateCoverLetterSaveStatus(currentCoverLetterId, "Saving...", "info");
 
-    // Set new timer - save after 1.5 seconds of no typing
     coverLetterAutosaveTimer = window.setTimeout(() => {
         if (coverLetterIsDirty && currentCoverLetterId) {
             saveCurrentCoverLetterToCloud({ silent: true });
@@ -2022,16 +2006,13 @@ function scheduleCoverLetterAutosave() {
 
 function markCoverLetterDirty(statusMessage = "Unsaved changes") {
     if (!coverLetterIsDirty) {
-        // Only show this when it becomes dirty
         updateCoverLetterSaveStatus("Unsaved changes", "info");
     }
     coverLetterIsDirty = true;
     scheduleCoverLetterAutosave();
 
-    // Optional: Change the tab title or add an indicator
     const titleInput = document.getElementById("coverLetterTitleInput");
     if (titleInput && titleInput.value && !titleInput.value.includes("•")) {
-        // Don't modify the actual title, just show indicator in UI elsewhere
         document.title = "• " + document.title.replace(/^•\s*/, "");
     }
 }
@@ -2094,15 +2075,12 @@ function switchWorkspace(workspace) {
     console.log("Switching workspace to:", workspace);
     currentWorkspace = workspace;
 
-    // Save to localStorage
     saveWorkspacePreference(workspace);
 
-    // Update tabs
     document.querySelectorAll(".workspace-tab").forEach((tab) => {
         tab.classList.toggle("active", tab.dataset.workspace === workspace);
     });
 
-    // Update panels
     const resumePanel = document.getElementById("resumeWorkspacePanel");
     const coverLetterPanel = document.getElementById("coverLetterWorkspacePanel");
     const resumeStage = document.getElementById("resumeStage");
@@ -2121,8 +2099,7 @@ function switchWorkspace(workspace) {
         if (resumeStage) resumeStage.classList.add("hidden");
         if (coverLetterStage) coverLetterStage.classList.remove("hidden");
         if (designPanel) designPanel.classList.add("hidden");
-        
-        // Only load cover letters if needed and user is logged in
+
         if (currentUser && coverLetterLibrary.length === 0) {
             loadCoverLetterLibrary();
         } else if (!currentUser) {
@@ -2152,23 +2129,17 @@ function generateCoverLetterContent() {
         generateBtn.textContent = "Generating...";
     }
 
-    // Extract relevant resume data
     const resumeText = extractResumeForCoverLetter();
-
-    // Generate cover letter using template-based approach
     const coverLetterText = createCoverLetterTemplate(resumeText, jobDescription);
 
-    // Display the generated cover letter as editable HTML
     const container = document.getElementById("coverLetterContainer");
     if (container) {
         container.innerHTML = formatCoverLetterHTML(coverLetterText);
-        // Make content editable
         container.contentEditable = "true";
         container.setAttribute("data-editable", "true");
         container.addEventListener("blur", saveCoverLetterOnEdit);
     }
 
-    // Save to current cover letter data
     currentCoverLetterData = {
         id: currentCoverLetterData?.id || Date.now().toString(),
         title: document.getElementById("coverLetterTitleInput")?.value || "Untitled Cover Letter",
@@ -2178,7 +2149,6 @@ function generateCoverLetterContent() {
         createdAt: currentCoverLetterData?.createdAt || new Date().toISOString()
     };
 
-    // Save to cloud if logged in
     if (currentUser && currentCoverLetterId) {
         saveCurrentCoverLetterToCloud({ silent: true });
     }
@@ -2225,7 +2195,6 @@ function createCoverLetterTemplate(resumeText, jobDescription) {
     const email = currentResumeData?.email || "email@example.com";
     const phone = currentResumeData?.phone || "+1 (555) 000-0000";
 
-    // Extract key skills and experience from job description
     const keySkills = extractKeySkills(jobDescription, currentResumeData?.skills || []);
     const recentRole = currentResumeData?.experience?.[0];
 
@@ -2249,7 +2218,6 @@ ${phone}`;
 }
 
 function formatCoverLetterHTML(text) {
-    // Convert plain text to formatted HTML with proper spacing
     const paragraphs = text.split('\n\n');
     return paragraphs.map(para => {
         if (!para.trim()) return '';
@@ -2261,7 +2229,6 @@ function saveCoverLetterOnEdit() {
     const container = document.getElementById("coverLetterContainer");
     if (!container || !currentCoverLetterData) return;
 
-    // Extract text content from edited HTML
     currentCoverLetterData.content = container.innerText || container.textContent || "";
 
     if (currentUser && currentCoverLetterId) {
@@ -2322,7 +2289,6 @@ function renderCoverLetterList() {
         return;
     }
 
-    // Determine how many items to show
     const itemsToShow = showAllCoverLetters ? coverLetterLibrary.length : Math.min(2, coverLetterLibrary.length);
     const visibleItems = coverLetterLibrary.slice(0, itemsToShow);
     const hasMore = coverLetterLibrary.length > 2;
@@ -2342,7 +2308,6 @@ function renderCoverLetterList() {
         </div>
     `).join("");
 
-    // Add show more button if applicable
     if (hasMore && !showAllCoverLetters) {
         html += `<button class="show-more-btn" onclick="toggleShowAllCoverLetters()">
             Show ${coverLetterLibrary.length - 2} more...
@@ -2355,15 +2320,15 @@ function renderCoverLetterList() {
 
     list.innerHTML = html;
 
-    // Attach delete event listeners
     list.querySelectorAll("[data-delete-cover-letter]").forEach((button) => {
         button.addEventListener("click", (event) => {
-            event.stopPropagation(); // Prevent triggering the parent click
+            event.stopPropagation();
             const id = button.getAttribute("data-delete-cover-letter");
             if (id) deleteCoverLetter(id);
         });
     });
 }
+
 function toggleShowAllCoverLetters() {
     showAllCoverLetters = !showAllCoverLetters;
     renderCoverLetterList();
@@ -2381,7 +2346,6 @@ function loadCoverLetter(id) {
     const coverLetter = coverLetterLibrary.find(cl => cl.id === id);
     if (!coverLetter) return;
 
-    // Clear status for the previous cover letter
     if (currentCoverLetterId) {
         updateCoverLetterSaveStatus(currentCoverLetterId, "", "info");
     }
@@ -2406,7 +2370,6 @@ function createNewCoverLetter() {
     if (currentUser) {
         createCoverLetterRecord();
     } else {
-        // Offline mode
         currentCoverLetterData = {
             id: Date.now().toString(),
             title: "New Cover Letter",
@@ -2472,7 +2435,6 @@ function saveCoverLetterPDF() {
     showToast("Cover letter exported as PDF.", "success");
 }
 
-
 function debugPDFCapture() {
     const container = document.getElementById("coverLetterContainer");
     const text = container?.innerText || "";
@@ -2488,11 +2450,11 @@ function debugPDFCapture() {
     element.style.padding = "60px 70px";
     element.style.boxSizing = "border-box";
     element.style.background = "#ffffff";
-    element.style.fontFamily = "Arial, sans-serif"; // ✅ no custom font, removes font-loading as a variable
+    element.style.fontFamily = "Arial, sans-serif";
     element.style.fontSize = "13px";
     element.style.lineHeight = "1.7";
     element.style.color = "#000000";
-    element.style.zIndex = "99999";  // ✅ on TOP this time so we can see it
+    element.style.zIndex = "99999";
     element.style.opacity = "1";
     element.textContent = text;
     document.body.appendChild(element);
@@ -2501,14 +2463,12 @@ function debugPDFCapture() {
     console.log("Element offsetHeight:", element.offsetHeight);
     console.log("Element textContent length:", element.textContent.length);
 
-    // Capture it with html2canvas directly
     html2canvas(element, {
         scale: 1,
         backgroundColor: "#ffffff",
-        logging: true,  // ✅ enables html2canvas internal logs
+        logging: true,
     }).then(canvas => {
         console.log("Canvas size:", canvas.width, "x", canvas.height);
-        // Show the canvas result in page so you can see what was captured
         canvas.style.border = "2px solid red";
         canvas.style.position = "fixed";
         canvas.style.top = "0";
@@ -2559,13 +2519,11 @@ function bindStudioEvents() {
     bindSidebarEvents();
     bindStyleControls();
 
-    // Workspace Tabs
     document.querySelectorAll(".workspace-tab").forEach((tab) => {
         tab.addEventListener("click", () => {
             switchWorkspace(tab.dataset.workspace);
         });
     });
-
 
     document.getElementById("savePdfBtn")?.addEventListener("click", generateCleanPDF);
     document.getElementById("importResumeBtn")?.addEventListener("click", () => {
@@ -2635,14 +2593,12 @@ function bindStudioEvents() {
         button.addEventListener("click", (event) => setLanguage(event.currentTarget.dataset.lang));
     });
 
-    // Cover Letter Events
     document.getElementById("generateCoverLetterBtn")?.addEventListener("click", generateCoverLetterContent);
     document.getElementById("saveCoverLetterPdfBtn")?.addEventListener("click", saveCoverLetterPDF);
     document.getElementById("copyCoverLetterBtn")?.addEventListener("click", copyCoverLetterText);
     document.getElementById("resetCoverLetterBtn")?.addEventListener("click", resetCoverLetter);
     document.getElementById("createNewCoverLetterBtn")?.addEventListener("click", createNewCoverLetter);
 
-    // Cover Letter Title Change
     document.getElementById("coverLetterTitleInput")?.addEventListener("input", () => {
         if (currentCoverLetterData) {
             currentCoverLetterData.title = document.getElementById("coverLetterTitleInput").value;
@@ -2653,7 +2609,6 @@ function bindStudioEvents() {
         }
     });
 
-    // Job Description Change
     document.getElementById("jobDescriptionInput")?.addEventListener("input", () => {
         if (currentCoverLetterData) {
             currentCoverLetterData.jobDescription = document.getElementById("jobDescriptionInput").value;
@@ -2663,19 +2618,15 @@ function bindStudioEvents() {
         }
     });
 
-    // Cover Letter Content Editable - Autosave on input
     const coverLetterContainer = document.getElementById("coverLetterContainer");
     if (coverLetterContainer) {
-        // Add input event listener for content changes
         coverLetterContainer.addEventListener("input", () => {
             if (currentCoverLetterData && currentCoverLetterId) {
-                // Update content in currentCoverLetterData
                 currentCoverLetterData.content = coverLetterContainer.innerText || coverLetterContainer.textContent || "";
                 markCoverLetterDirty("Editing cover letter");
             }
         });
 
-        // Also listen for blur events to ensure save
         coverLetterContainer.addEventListener("blur", () => {
             if (coverLetterIsDirty && currentCoverLetterId) {
                 saveCurrentCoverLetterToCloud({ silent: true });
@@ -2683,7 +2634,6 @@ function bindStudioEvents() {
         });
     }
 
-    // Cover Letter Title Autosave
     const coverLetterTitleInput = document.getElementById("coverLetterTitleInput");
     if (coverLetterTitleInput) {
         coverLetterTitleInput.addEventListener("input", () => {
@@ -2695,7 +2645,6 @@ function bindStudioEvents() {
         });
     }
 
-    // Job Description Autosave
     const jobDescriptionInput = document.getElementById("jobDescriptionInput");
     if (jobDescriptionInput) {
         jobDescriptionInput.addEventListener("input", () => {
@@ -2706,9 +2655,6 @@ function bindStudioEvents() {
         });
     }
 }
-
-
-
 
 async function hydrateAuthSession() {
     if (!supabaseClient) {
@@ -2733,7 +2679,6 @@ function maybeShowConfigHint() {
     if (hasSupabaseCredentials()) return;
     setAuthStatus("Supabase is not configured yet. Update supabase-config.js with your project URL and anon key.", "error");
 }
-
 
 window.loadCoverLetter = loadCoverLetter;
 window.toggleShowAllCoverLetters = toggleShowAllCoverLetters;
@@ -2761,13 +2706,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     maybeShowConfigHint();
     await hydrateAuthSession();
 
-    // Load cover letters if user is logged in
     if (currentUser) {
         await loadCoverLetterLibrary();
     }
 
-    // IMPORTANT: Restore workspace AFTER all loading is complete
-    // Use setTimeout to ensure DOM is fully updated
     setTimeout(() => {
         const savedWorkspace = loadWorkspacePreference();
         console.log("Restoring workspace to:", savedWorkspace);
