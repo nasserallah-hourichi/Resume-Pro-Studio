@@ -579,6 +579,21 @@ const customSectionsMarkup = (data.customSections || []).map((section) => buildS
     `;
 }
 
+function buildSectionMarkup(sectionType, title, contentHtml, actionHtml) {
+    if (!sectionVisibility[sectionType]) return "";
+
+    return `
+        <div class="draggable-section" data-section-type="${sectionType}">
+            <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
+            <button class="btn-delete-section" data-delete-section="${sectionType}" title="Delete section" type="button">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="section-title" style="color: var(--section-title-color, #0f172a); font-size: var(--section-title-size, 0.9rem);">${title}</div>
+            ${contentHtml}
+            ${actionHtml || ""}
+        </div>
+    `;
+}
 function initSortable() {
     const container = document.getElementById("sectionsContainer");
     if (!container) return;
